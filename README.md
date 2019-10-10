@@ -25,6 +25,7 @@ pip install nltk
 
 **Important Files**
 * **app.py** Entry point of the front end. Handles the search request and update the UI with results.
-* **dmrankedquery.py** Handles the query request and returns the documents based on tf-idf score
-* **dmrankedquery_cosine.py** Handles the query request and returns the documents based on tf-idf and cosine similarity score
-* **docRetriever.py** Utility file that returns the original product data based on document Ids
+* **dmrankedquery.py** Handles the query request and returns the documents based on tf-idf score.
+* **dmrankedquery_cosine.py** Handles the query request and returns the documents based on tf-idf and cosine similarity score.
+* **docRetriever.py** Utility file that returns the original product data based on document Ids.
+* **dmsearchranked.py** This file creates the inverted index and tf idf, and stores in a file.
