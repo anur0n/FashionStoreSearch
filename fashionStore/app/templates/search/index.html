@@ -1,0 +1,58 @@
+{% extends 'includes/base.html' %}
+
+{% block body %}
+<div class="row mb-12">
+    <div class="col-lg-12 w-100" style="background-color: #FFF">
+        <div class="col-lg-6">
+            <div class="bg-white p-4 rounded shadow" style="padding-bottom: 0px;">
+                <form action="" action="/" method="POST" style="margin-bottom: 0px;">
+                    <div class="input-group mb-4 border rounded-pill p-1">
+                        <input
+                                type="text"
+                                placeholder="Search your product"
+                                aria-describedby="button-addon3"
+                                class="form-control bg-none border-0"
+                                name="query"
+                                value="{{ query }}"
+                        >
+                        <div class="input-group-append border-0">
+                            <button id="button-addon3" type="button" class="btn btn-link text-success"><i
+                                    class="fa fa-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if titles|length > 0 %}
+<h5 style="font-size: 20px; padding: 2px; margin: 5px;"><font color="white">Top {{ titles|length }} results for <b><i>'{{query|safe}}'</i></b></font></h5>
+{% else %}
+<h5 style="font-size: 20px; padding: 2px; margin: 5px;"><font color="white">No products found for <b><i>'{{query|safe}}'</i></b></font></h5>
+{% endif %}
+
+{% if titles|length > 0 %}
+<section>
+    <div class="row">
+        <div class="col-12 col-lg-offset-8">
+            {% for i in range(0, titles|length) %}
+            <div class="card py-md-1 px-md-1 m-2">
+				<div class="card-body">
+				    <div id=left>
+        			    <img src={{ images[i] }} width = "110"/>
+        			</div>
+        			<div id=right>
+    					<h5 class="card-title">{{ titles[i]|safe }} <i>(Score:{{'%0.4f'| format(scores[i]|float)}})</i></h5>
+    					<p class="card-text">{{descriptions[i]|safe}}</p>
+					</div>
+				</div>
+			</div>
+
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}
