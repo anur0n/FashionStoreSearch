@@ -25,11 +25,12 @@
         </div>
     </div>
 </div>
-
-{% if titles|length > 0 %}
-<h5 style="font-size: 20px; padding: 2px; margin: 5px;"><font color="white">Top {{ titles|length }} results for <b><i>'{{query|safe}}'</i></b></font></h5>
-{% else %}
-<h5 style="font-size: 20px; padding: 2px; margin: 5px;"><font color="white">No products found for <b><i>'{{query|safe}}'</i></b></font></h5>
+{% if titles is defined %}
+    {% if titles|length > 0 %}
+    <h5 style="font-size: 20px; padding: 2px; margin: 5px;"><font color="white">Top {{ titles|length }} results for <b><i>'{{query|safe}}'</i></b></font></h5>
+    {% else %}
+    <h5 style="font-size: 20px; padding: 2px; margin: 5px;"><font color="white">No products found for <b><i>'{{query|safe}}'</i></b></font></h5>
+    {% endif %}
 {% endif %}
 
 {% if titles|length > 0 %}
