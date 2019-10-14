@@ -44,8 +44,35 @@
         			    <img src={{ images[i] }} width = "110"/>
         			</div>
         			<div id=right>
-    					<h5 class="card-title">{{ titles[i]|safe }} <i>(Score:{{'%0.4f'| format(scores[i]|float)}})</i></h5>
+    					<h5 class="card-title">{{ titles[i]|safe }} </h5>
     					<p class="card-text">{{descriptions[i]|safe}}</p>
+					</div>
+					<div>
+					    <b><i>Total tf-idf Score:   {{'%0.4f'| format(tf_idf_scores[i]|float)}}</i></b>
+					    <br>
+					    <b><i>Document length:   {{docLengths[i]}}</i></b>
+					    <br><br>
+					</div>
+					<div>
+
+					    <table style="width:100%">
+					        <tr>
+					            <th>Query terms</th>
+                                <th>tf-score</th>
+                                <th>idf-score</th>
+                                <th>tf-idf</th>
+                            </tr>
+					        {% for j in range(0, terms|length) %}
+
+                                <tr>
+                                    <td>{{terms[j]}}</td>
+                                    <td>{{'%0.4f'| format(tf_scores[i][j]|float)}}</td>
+                                    <td>{{'%0.4f'| format(idf_scores[i][j]|float)}}</td>
+                                    <td>{{'%0.4f'| format((tf_scores[i][j] * idf_scores[i][j])|float)}}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+
 					</div>
 				</div>
 			</div>

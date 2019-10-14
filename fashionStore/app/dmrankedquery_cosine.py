@@ -35,9 +35,9 @@ from nltk.stem import WordNetLemmatizer
 
 MY_DRIVE = os.getcwd() #'/content/drive/My Drive/Data Mining'
 
-STYLE_WITH_DESC_N_TITLE = MY_DRIVE+'/app/styles_with_description_title.csv'
+STYLE_WITH_DESC_N_TITLE = MY_DRIVE+'/styles_with_description_title.csv'
 
-INVERTED_IDX_FILE = MY_DRIVE+'/app/store_index_tf_idf_Random_lemmatized.dat'
+INVERTED_IDX_FILE = MY_DRIVE+'/store_index_tf_idf_Random_lemmatized.dat'
 
 MAX_NO_RESULT = 20
 

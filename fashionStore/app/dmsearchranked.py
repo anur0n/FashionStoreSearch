@@ -18,7 +18,7 @@ from collections import defaultdict
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from array import array
-#from tqdm import tqdm
+from tqdm import tqdm
 import csv
 import math
 import re
@@ -27,11 +27,11 @@ import os
 from nltk.stem import WordNetLemmatizer
 
 
-MY_DRIVE = os.getcwd() #'/content/drive/My Drive/Data Mining'
+MY_DRIVE = '/content/drive/My Drive/Data Mining'
 
-STYLE_WITH_DESC_N_TITLE = MY_DRIVE+'/app/styles_with_description_title_RandomSampled.csv'
+STYLE_WITH_DESC_N_TITLE = MY_DRIVE+'/styles_with_description_title_RandomSampled.csv'
 
-INVERTED_IDX_FILE = MY_DRIVE+'/app/store_index_tf_idf_Random_lemmatized.dat'
+INVERTED_IDX_FILE = MY_DRIVE+'/store_index_tf_idf_Random_lemmatized.dat'
 
 COL_INDEX_ID = 0
 COL_INDEX_DISPLAY_NAME = 9
@@ -58,7 +58,7 @@ class RankedIndexer():
 
     terms = [term for term in terms if term not in self.stopwords]
     terms = [self.lemmatizer.lemmatize(term) for term in terms]
-    # terms = [self.stemmer.stem(term) for term in terms]
+    terms = [self.stemmer.stem(term) for term in terms]
     #print('Terms:\n\n')
     #print(terms)
     return terms
@@ -95,7 +95,7 @@ class RankedIndexer():
     with open(STYLE_WITH_DESC_N_TITLE, 'r', encoding='latin-1') as csvfile:
       reader = csv.reader(csvfile)
 
-      for rowNo, row in enumerate((reader)):
+      for rowNo, row in enumerate(tqdm(reader)):
         if rowNo==0:
           continue
         docId = row[COL_INDEX_ID]

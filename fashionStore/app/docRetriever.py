@@ -2,13 +2,11 @@ import csv
 #from tqdm import tqdm
 import os
 
-MY_DRIVE = os.getcwd() #'/content/drive/My Drive/Data Mining'
+MY_DRIVE = os.getcwd() + '/app' #'/content/drive/My Drive/Data Mining'
 
-STYLE_WITH_DESC_N_TITLE = MY_DRIVE+'/app/styles_with_description_title.csv'
+STYLE_WITH_DESC_N_TITLE = MY_DRIVE+'/styles_with_description_title.csv'
 
-STYLE_WITH_DESC_N_TITLE_RANDOM = MY_DRIVE+'/app/styles_with_description_title_RandomSampled.csv'
-
-INVERTED_IDX_FILE = MY_DRIVE+'/app/store_index.dat'
+STYLE_WITH_DESC_N_TITLE_RANDOM = MY_DRIVE+'/styles_with_description_title_RandomSampled.csv'
 
 DOC_ID_COL_IDX = 0
 

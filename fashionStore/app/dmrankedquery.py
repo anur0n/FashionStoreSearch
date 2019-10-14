@@ -30,14 +30,14 @@ import datetime
 from numpy import dot
 from numpy.linalg import norm
 from docRetriever import DocRetriever
-from nltk.stem import WordNetLemmatizers
+from nltk.stem import WordNetLemmatizer
 
-MY_DRIVE = os.getcwd() #'/content/drive/My Drive/Data Mining'
+MY_DRIVE = os.getcwd() + '/app' #'/content/drive/My Drive/Data Mining'
 
-STYLE_WITH_DESC_N_TITLE = MY_DRIVE+'/app/styles_with_description_title.csv'
+STYLE_WITH_DESC_N_TITLE = MY_DRIVE+'/styles_with_description_title.csv'
 # INVERTED_IDX_FILE = MY_DRIVE+'/app/store_index_tf_idf_Random.dat'
 
-INVERTED_IDX_FILE = MY_DRIVE+'/app/store_index_tf_idf_Random_lemmatized.dat'
+INVERTED_IDX_FILE = MY_DRIVE+'/store_index_tf_idf_Random_lemmatized.dat'
 
 MAX_NO_RESULT = 20
 
@@ -90,15 +90,20 @@ class QueryHandler():
     else:
       return QueryType.FTQ
 
-  def getTerms(self, doc):
+  def getTerms(self, doc, noReduction = False, uniqueTermsOnly = False):
     #print('Original\n'+doc)
     doc = doc.lower()
     #print('lowered\n\n'+doc)
     doc = re.sub(r'[^a-z0-9 ]',' ',doc) #put spaces instead of non-alphanumeric characters
     terms = doc.split()
 
-    terms = [term for term in terms if term not in self.stopwords]
-    terms = [self.stemmer.stem(term) for term in terms]
+    if not noReduction:
+        terms = [term for term in terms if term not in self.stopwords]
+        terms = [self.lemmatizer.lemmatize(term) for term in terms]
+        terms = [self.stemmer.stem(term) for term in terms]
+
+    if uniqueTermsOnly:
+        terms = (dict.fromkeys(terms))
     #print('Terms:\n\n')
     #print(terms)
     return terms
@@ -126,40 +131,16 @@ class QueryHandler():
           docVectors[doc][termIndex] = float(tfScores[docIndex])
 #       print('Ranking3: '+str(datetime.datetime.now()))
     print(queryVector)
-    docScores=[[self.dotProduct(curDocVec, queryVector), doc] for doc, curDocVec in docVectors.items()]
+    docScores=[[self.dotProduct(curDocVec, queryVector), doc, curDocVec, queryVector] for doc, curDocVec in docVectors.items()]
     print('Ranking4')
     print(datetime.datetime.now())
-#     print(docScores)
+    # print(docScores[0])
     docScores.sort(reverse=True)
     resultDocs=[x for x in docScores][:MAX_NO_RESULT]
 
     #print('\n'.join(resultDocs), '\n')
 
     return resultDocs
-
-  def performOneWordQuery(self, query):
-    originalQuery = query
-    query = self.getTerms(query)
-
-    if len(query) == 0:
-      print('Empty')
-      return
-
-    if len(query) > 1:
-      self.performFreeTextQuery(originalQuery)
-      return
-
-    query = query[0]
-    if query not in self.index:
-      print('Not found')
-    else:
-      posting = self.index[query]
-      docs = [str(x[0]) for x in posting]
-      #posting =' '.join(map(str,posting))  #docid's are integers
-
-      #print(posting)
-
-      return self.rankDocuments(query, docs)
 
 
   def performFreeTextQuery(self, query):
@@ -262,30 +243,34 @@ class QueryHandler():
 
     docs = []
 
-    if queryType == QueryType.OWQ:
-      docs = self.performOneWordQuery(query)
-    elif queryType == QueryType.FTQ:
+    if queryType == QueryType.FTQ:
       docs = self.performFreeTextQuery(query)
     elif queryType == QueryType.PhQ:
       docs = self.performPhraseQuery(query)
 
-    print(docs)
+    # print(docs)
     docRetriever = DocRetriever()
     # print(type(docs[0]))
     docs=[docs[i] for i in range(min(MAX_NO_RESULT, len(docs)))]
-    print('Returned doc length: '+str(len(docs)))
-    print(docs)
+    # print('Returned doc length: '+str(len(docs)))
+    # print(docs)
 
-    scores = [x[0] for x in docs]
-    print(scores)
-    docs = [x[1] for x in docs]
-    print(docs)
-    docs = docRetriever.retrieveDocs(docs)
-    print(docs)
+    tf_idf_scores = [x[0] for x in docs]
+    # print(scores)
+    docIds = [x[1] for x in docs]
+    # print(docs)
+    tf_scores = [x[2] for x in docs]
+
+    idf_scores = [x[3] for x in docs]
+
+    # print(idf_scores)
+
+    docItems = docRetriever.retrieveDocs(docIds)
+    # print(docs)
 
 
 
-    return (docs, scores)
+    return (docItems, tf_idf_scores, tf_scores, idf_scores)
 
 
 if __name__ == '__main__':
@@ -293,5 +278,5 @@ if __name__ == '__main__':
   queryHandler.prepareParams()
   queryHandler.readIndex()
   result = queryHandler.performQuery('Red checked tshirt for men')
-  print(result)
+#   print(result)
   print('Search complete')
