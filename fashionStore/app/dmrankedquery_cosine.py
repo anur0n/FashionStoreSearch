@@ -12,6 +12,7 @@ Original file is located at
 
 import nltk
 nltk.download('stopwords')
+nltk.download('wordnet')
 
 from collections import defaultdict
 from nltk.corpus import stopwords
@@ -30,12 +31,13 @@ from numpy import dot
 from numpy.linalg import norm
 from docRetriever import DocRetriever
 import numpy as np
+from nltk.stem import WordNetLemmatizer
 
 MY_DRIVE = os.getcwd() #'/content/drive/My Drive/Data Mining'
 
 STYLE_WITH_DESC_N_TITLE = MY_DRIVE+'/app/styles_with_description_title.csv'
 
-INVERTED_IDX_FILE = MY_DRIVE+'/app/store_index_tf_idf_Random.dat'
+INVERTED_IDX_FILE = MY_DRIVE+'/app/store_index_tf_idf_Random_lemmatized.dat'
 
 MAX_NO_RESULT = 20
 
@@ -80,6 +82,7 @@ class QueryHandler():
     self.dataFile = STYLE_WITH_DESC_N_TITLE
     self.indexFile = INVERTED_IDX_FILE
     self.stemmer = PorterStemmer()
+    self.lemmatizer = WordNetLemmatizer()
 
   def detectQueryType(self, query):
     if '"' in query:
@@ -94,8 +97,9 @@ class QueryHandler():
     doc = re.sub(r'[^a-z0-9 ]',' ',doc) #put spaces instead of non-alphanumeric characters
     terms = doc.split()
 
-    terms = [term for term in terms if term not in self.stopwords]
-    terms = [self.stemmer.stem(term) for term in terms]
+    # terms = [term for term in terms if term not in self.stopwords]
+    terms = [self.lemmatizer.lemmatize(term) for term in terms]
+    # terms = [self.stemmer.stem(term) for term in terms]
     #print('Terms:\n\n')
     #print(terms)
     return terms

@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 import time
-from dmrankedquery import QueryType, QueryHandler
+from dmrankedquery_cosine import QueryType, QueryHandler
 #from tqdm import tqdm
 
 app = Flask(__name__)

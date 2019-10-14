@@ -57,8 +57,8 @@ class RankedIndexer():
     terms = doc.split()
 
     terms = [term for term in terms if term not in self.stopwords]
-#     terms = [self.lemmatizer.lemmatize(term) for term in terms]
-    terms = [self.stemmer.stem(term) for term in terms]
+    terms = [self.lemmatizer.lemmatize(term) for term in terms]
+    # terms = [self.stemmer.stem(term) for term in terms]
     #print('Terms:\n\n')
     #print(terms)
     return terms

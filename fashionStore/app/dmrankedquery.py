@@ -12,6 +12,7 @@ Original file is located at
 
 import nltk
 nltk.download('stopwords')
+nltk.download('wordnet')
 
 from collections import defaultdict
 from nltk.corpus import stopwords
@@ -29,12 +30,14 @@ import datetime
 from numpy import dot
 from numpy.linalg import norm
 from docRetriever import DocRetriever
+from nltk.stem import WordNetLemmatizers
 
 MY_DRIVE = os.getcwd() #'/content/drive/My Drive/Data Mining'
 
 STYLE_WITH_DESC_N_TITLE = MY_DRIVE+'/app/styles_with_description_title.csv'
+# INVERTED_IDX_FILE = MY_DRIVE+'/app/store_index_tf_idf_Random.dat'
 
-INVERTED_IDX_FILE = MY_DRIVE+'/app/store_index_tf_idf_Random.dat'
+INVERTED_IDX_FILE = MY_DRIVE+'/app/store_index_tf_idf_Random_lemmatized.dat'
 
 MAX_NO_RESULT = 20
 
@@ -79,6 +82,7 @@ class QueryHandler():
     self.dataFile = STYLE_WITH_DESC_N_TITLE
     self.indexFile = INVERTED_IDX_FILE
     self.stemmer = PorterStemmer()
+    self.lemmatizer = WordNetLemmatizer()
 
   def detectQueryType(self, query):
     if '"' in query:
