@@ -117,7 +117,7 @@ class RankedIndexer():
         norm = 0
         for term, posting in termDict.items():
           norm += len(posting)**2
-          norm = math.sqrt(norm)
+        norm = math.sqrt(norm)
 
         #calculate tf and df weights
         for term, posting in termDict.items():
