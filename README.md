@@ -1,5 +1,6 @@
-# Fashion Store Search
+# Fashion Store Search and classification
 This project implements a small search engine which searches over thousands of data of dataset containing info about lifestyle products. 
+Also provides feature to classify the category of the applying Naive Bayes Classification on product description.
 
 **Required Libraries**
 
