@@ -16,9 +16,6 @@ nbClassifier = NaiveBayesClassifier(productCategories)
 isIndexLoaded = False
 isNBCIndexLoaded = False
 
-def defaultDict():
-    return 0
-
 def highlight_terms(queryTerms, doc):
 
     termdict = []

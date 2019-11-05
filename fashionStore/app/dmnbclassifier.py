@@ -232,7 +232,7 @@ class NaiveBayesClassifier:
         cleaned_example=preprocess_string(example) 
           
         #simply get the posterior probability of every example                                  
-        post_prob=self.classify(cleaned_example) #get prob of this example for both classes
+        post_prob, _, _, _, _ =self.classify(cleaned_example) #get prob of this example for both classes
         
         #simply pick the max value and map against self.classes!
         predictions.append(self.categories[np.argmax(post_prob)])

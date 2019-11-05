@@ -111,10 +111,10 @@
 					<table style="width:100%" cellspacing="10">
 						<tr>
 							<th align="center">Query terms</th>
-							<th align="center">frequency of term in '{{detectedCategory}}'</th>
+							<th align="center">freq of term in '{{detectedCategory}}'</th>
 							<th align="center">No of Terms in '{{detectedCategory}}' + |Vocab|</th>
-							<th align="center">probability(term|'{{detectedCategory}}')</th>
-							<th align="center">log(probability(term|'{{detectedCategory}}'))</th>
+							<th align="center">p(term|'{{detectedCategory}}')</th>
+							<th align="center">log(p(term|'{{detectedCategory}}'))</th>
 							
 						</tr>
 						{% for j in range(0, terms|length) %}
@@ -128,7 +128,7 @@
 							</tr>
 						{% endfor %}
 						<tr>
-							<th align="center" colspan="4">Total : <br>log(probability({{detectedCategory}})) = {{priorProb}} <br>+<br> sum(log(probability(term|'{{detectedCategory}}')))</th>
+							<th align="center" colspan="4">Total : <br>log(p({{detectedCategory}})) = {{priorProb}} <br>+<br> sum(log(p(term|'{{detectedCategory}}')))</th>
 							<th align="center">{{'%f'| format(totalScore|float)}}</th>
 							
 						</tr>
