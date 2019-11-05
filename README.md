@@ -9,6 +9,8 @@ Download following libraries:
 pip install flask
 pip install numpy
 pip install nltk
+pip install scipy
+pip install sklearn
 ```
 
 
@@ -29,3 +31,4 @@ pip install nltk
 * **dmrankedquery_cosine.py** Handles the query request and returns the documents based on tf-idf and cosine similarity score.
 * **docRetriever.py** Utility file that returns the original product data based on document Ids.
 * **dmsearchranked.py** This file creates the inverted index and tf idf, and stores in a file.
+* **dmnbclassifier.py** This file creates the inverted index, saves and loads from file. And handles classification requests and returns classification results.
