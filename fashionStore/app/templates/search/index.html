@@ -1,86 +1,210 @@
+
 {% extends 'includes/base.html' %}
+
 
 {% block body %}
 <div class="row mb-12">
     <div class="col-lg-12 w-100" style="background-color: #FFF">
         <div class="col-lg-6">
-            <div class="bg-white p-4 rounded shadow" style="padding-bottom: 0px;">
-                <form action="" action="/" method="POST" style="margin-bottom: 0px;">
-                    <div class="input-group mb-4 border rounded-pill p-1">
-                        <input
-                                type="text"
-                                placeholder="Search your product"
-                                aria-describedby="button-addon3"
-                                class="form-control bg-none border-0"
-                                name="query"
-                                value="{{ query }}"
-                        >
-                        <div class="input-group-append border-0">
-                            <button id="button-addon3" type="button" class="btn btn-link text-success"><i
-                                    class="fa fa-search"></i></button>
-                        </div>
-                    </div>
-                </form>
+            <div class="bg-white p-4 rounded shadow" style="padding-bottom: 0px;">				
+				<form class="inline" action="/" method="POST" style="margin-bottom: 0px;">
+						<div class="input-group mb-4 border rounded-pill p-1">
+							<input
+									type="textarea"
+									placeholder="Search your product"
+									aria-describedby="button-addon3"
+									class="form-control bg-none border-0"
+									name="query"
+									value="{{ query }}"
+							>
+							<div class="input-group-append border-0">
+								<button id="button-addon3" type="button" class="btn btn-link text-success"><i
+										class="fa fa-search"></i></button>
+							</div>
+							<div class="input-group-append">
+								<input type="submit" name="action" class="btn btn-info" value="Search"></input>
+							</div>
+							<div class="input-group-append">
+								<input type="submit" name="action" class="btn btn-info" value="Classify" style="margin-left:5"></input>
+							</div>
+						</div>
+				</form>
             </div>
         </div>
     </div>
 </div>
-{% if titles is defined %}
-    {% if titles|length > 0 %}
-    <h5 style="font-size: 20px; padding: 2px; margin: 5px;"><font color="white">Top {{ titles|length }} results for <b><i>'{{query|safe}}'</i></b></font></h5>
-    {% else %}
-    <h5 style="font-size: 20px; padding: 2px; margin: 5px;"><font color="white">No products found for <b><i>'{{query|safe}}'</i></b></font></h5>
-    {% endif %}
-{% endif %}
-
-{% if titles|length > 0 %}
-<section>
-    <div class="row">
-        <div class="col-12 col-lg-offset-8">
-            {% for i in range(0, titles|length) %}
-            <div class="card py-md-1 px-md-1 m-2">
-				<div class="card-body">
-				    <div id=left>
-        			    <img src={{ images[i] }} width = "110"/>
-        			</div>
-        			<div id=right>
-    					<h5 class="card-title">{{ titles[i]|safe }} </h5>
-    					<p class="card-text">{{descriptions[i]|safe}}</p>
-					</div>
-					<div>
-					    <b><i>Total tf-idf Score:   {{'%0.4f'| format(tf_idf_scores[i]|float)}}</i></b>
-					    <br>
-					    <b><i>Document length:   {{docLengths[i]}}</i></b>
-					    <br><br>
-					</div>
-					<div>
-
-					    <table style="width:100%">
-					        <tr>
-					            <th>Query terms</th>
-                                <th>tf-score</th>
-                                <th>idf-score</th>
-                                <th>tf-idf</th>
-                            </tr>
-					        {% for j in range(0, terms|length) %}
-
-                                <tr>
-                                    <td>{{terms[j]}}</td>
-                                    <td>{{'%0.4f'| format(tf_scores[i][j]|float)}}</td>
-                                    <td>{{'%0.4f'| format(idf_scores[i][j]|float)}}</td>
-                                    <td>{{'%0.4f'| format((tf_scores[i][j] * idf_scores[i][j])|float)}}</td>
-                                </tr>
-                            {% endfor %}
-                        </table>
-
-					</div>
+{% if opType is defined %}
+	{% if opType == 'classification'%}
+		
+		<div class="card py-md-1 px-md-1 m-2">
+			<div class="card-body">
+				<div>
+					<p class="card-text">Showing Classification result for: <font color="#1A4373" size="5"><br><br><i>"{{query|safe}}"</i></font></p>
 				</div>
 			</div>
+		</div>
+		
+		<div class="card py-md-1 px-md-1 m-2 mb-4" width="">
+			<div class="card-body">
+				<!--<span class="pull-right">-->
+					<h7 style="font-size: 20px; padding: 2px; margin: 0 auto;"><font color="black">Predicted Category: <b>{{detectedCategory}}<br><br><br></b></font></h7>
+				<!--</span>-->
+				<span>
+					<div class="col-lg-6">
+						{% if percentage| length > 0 %}
+							<div class="skill-mf" style="margin-bottom:10px">
+							  <p class="title-s">Product Classification: </p>
+							  {% for j in range(0, sortedCategory|length) %}
+								  <!--{% if percentage[j] > 0 %}-->
+									  <span>{{sortedCategory[j]}}    <i>(Score: {{'%f'| format(sortedProb[j]|float)}})</i></span> <span class="pull-right">{{'%0.2f'|format(percentage[j]*100.0)}}%</span>
+									  <div class="progress" style="margin-bottom:5">
+										<div class="progress-bar" role="progressbar" style="width: {{'%0.2f'| format(percentage[j]*100.0|float)}}% " aria-valuenow="{{'%0.2f'| format(percentage[j]*100.0|float)}}" aria-valuemin="0"
+										  aria-valuemax="100"></div>
+									  </div>
+									  <br>
+								  <!--{% endif %}-->
+							  {% endfor %}   
+							</div>
+						{% endif %}
 
-            {% endfor %}
-        </div>
-    </div>
-</section>
+						<!--
+						<table style="width:100%" cellspacing="10">
+							<tr>
+								<th align="center">Category</th>
+								<th align="center">Final Naive Bayes Classification Score</th>
+								<th align="center">Percentage</th>
+							</tr>
+							{% for j in range(0, sortedCategory|length) %}
+
+								<tr>
+									<td align="center">{{sortedCategory[j]}}</td>
+									<td align="center">{{'%f'| format(sortedProb[j]|float)}}</td>
+									<!-- <td align="center">{{'%f'| format(percentage[j]*100.0|float)}}%</td> -->
+									<!--<td align="center">
+									<div class="progress">
+									  <div id = 'progressBar{{j}}' class="progress-bar" role="progressbar" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100" style="width: 30%;">
+										<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+										<script> $("#progressBar{{j}}").css("width","{{'%f'| format(percentage[j]*100.0|float)}}%"); </script>
+									  </div>
+									</div>
+									{{'%0.2f'| format(percentage[j]*100.0|float)}}%
+									<!--<td align="center">
+										<div class="progress">
+											<div class="progress-bar" role="progressbar" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+										</div>-->
+									<!--</td>
+								</tr>
+							{% endfor %}
+						</table>
+						-->
+
+					</div>
+				</span>
+			</div>
+		</div>
+		
+		<div class="card py-md-1 px-md-1 m-2">
+			<div class="card-body">
+				<div>
+					<h7 style="font-size: 20px; padding: 2px; margin: 0 auto;"><font color="black">Calculation steps:<br><br></font></h7>
+
+					<table style="width:100%" cellspacing="10">
+						<tr>
+							<th align="center">Query terms</th>
+							<th align="center">frequency of term in '{{detectedCategory}}'</th>
+							<th align="center">No of Terms in '{{detectedCategory}}' + |Vocab|</th>
+							<th align="center">probability(term|'{{detectedCategory}}')</th>
+							<th align="center">log(probability(term|'{{detectedCategory}}'))</th>
+							
+						</tr>
+						{% for j in range(0, terms|length) %}
+
+							<tr>
+								<td align="center">{{terms[j]}}</td>
+								<td align="center">{{'%f'| format(term_freqs[j]|float)}}</td>
+								<td align="center">{{denom}}</td>
+								<td align="center">{{'%0.9f'| format(term_freqs[j]/denom|float)}}</td>
+								<td align="center">{{'%f'| format(logOfProb[j]|float)}}</td>
+							</tr>
+						{% endfor %}
+						<tr>
+							<th align="center" colspan="4">Total : <br>log(probability({{detectedCategory}})) = {{priorProb}} <br>+<br> sum(log(probability(term|'{{detectedCategory}}')))</th>
+							<th align="center">{{'%f'| format(totalScore|float)}}</th>
+							
+						</tr>
+					</table>
+
+				</div>
+			</div>
+		</div>
+	
+	
+	{% elif opType == 'search' %}
+	
+	
+		{% if titles is defined %}
+			{% if titles|length > 0 %}
+			<h5 style="font-size: 20px; padding: 2px; margin: 5px;"><font color="white">Top {{ titles|length }} results for <b><i>'{{query|safe}}'</i></b></font></h5>
+			{% else %}
+			<h5 style="font-size: 20px; padding: 2px; margin: 5px;"><font color="white">No products found for <b><i>'{{query|safe}}'</i></b></font></h5>
+			{% endif %}
+		{% endif %}
+
+		{% if titles|length > 0 %}
+		<section>
+			<div class="row">
+				<div class="col-12 col-lg-offset-8">
+					{% for i in range(0, titles|length) %}
+					<div class="card py-md-1 px-md-1 m-2">
+						<div class="card-body">
+							<div id=left>
+								<img src={{ images[i] }} width = "110"/>
+							</div>
+							<div id=right>
+								<h5 class="card-title">{{ titles[i]|safe }} </h5>
+								<p class="card-text">{{descriptions[i]|safe}}</p>
+							</div>
+							<div>
+								<b><i>Total tf-idf Score:   {{'%0.4f'| format(tf_idf_scores[i]|float)}}</i></b>
+								<br>
+								<b><i>Document length:   {{docLengths[i]}}</i></b>
+								<br><br>
+							</div>
+							<div>
+
+								<table style="width:100%">
+									<tr>
+										<th>Query terms</th>
+										<th>tf-score</th>
+										<th>idf-score</th>
+										<th>tf-idf</th>
+									</tr>
+									{% for j in range(0, terms|length) %}
+
+										<tr>
+											<td>{{terms[j]}}</td>
+											<td>{{'%0.4f'| format(tf_scores[i][j]|float)}}</td>
+											<td>{{'%0.4f'| format(idf_scores[i][j]|float)}}</td>
+											<td>{{'%0.4f'| format((tf_scores[i][j] * idf_scores[i][j])|float)}}</td>
+										</tr>
+									{% endfor %}
+								</table>
+
+							</div>
+						</div>
+					</div>
+
+					{% endfor %}
+				</div>
+			</div>
+		</section>
+		{% endif %}
+	
+	
+	{% endif %}
 {% endif %}
+
+
+
 
 {% endblock %}
