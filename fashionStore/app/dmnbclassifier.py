@@ -83,6 +83,8 @@ class NaiveBayesClassifier:
       token_words = self.getTerms(product)
       for token in token_words:
         counter += 1
+        if not token in self.index[category]:
+          self.index[category][token] = 0
         self.index[category][token]+=1 #increment in its count
     # print(counter)
     # print(category)
@@ -93,7 +95,7 @@ class NaiveBayesClassifier:
     # for i, desc in enumerate(self.productDescriptions):
     #   if 'shirt' not in desc.lower():
     #     print(i)
-    self.index = np.array([defaultdict(defaultDict) for i in range(self.categories.shape[0])])
+    self.index = np.array([defaultdict(int) for i in range(self.categories.shape[0])])
     # print(len(self.labels))
     
     for idx, category in enumerate(self.categories):
