@@ -287,9 +287,43 @@ if __name__ == "__main__":
   print(categories)
 
   print(len(descriptions))
-  nbc = NaiveBayesClassifier(productCategories)
+  evaluation = []
+  smoothing = 100.0
 
-  # nbc.train(X_train,y_train)
+  for i in range(15):
+    nbc = NaiveBayesClassifier(productCategories)
+    nbc.smoothing = smoothing
+
+    nbc.train(X_train,y_train)
+
+    pclasses=nbc.test(X_test) #get predcitions for test set
+    # print(pclasses)
+    test_acc=np.sum(pclasses==y_test)/len(y_test)
+
+    print('For '+str(smoothing)+' : ')
+    # accuracy: (tp + tn) / (p + n)
+    accuracy = accuracy_score(y_test, pclasses)
+    print('Accuracy: %f' % accuracy)
+    # precision tp / (tp + fp)
+    precision = precision_score(y_test, pclasses, average='macro')
+    print('Precision: %f' % precision)
+    # recall: tp / (tp + fn)
+    recall = recall_score(y_test, pclasses, average='macro')
+    print('Recall: %f' % recall)
+    # f1: 2 tp / (2 tp + fp + fn)
+    f1 = f1_score(y_test, pclasses, average='macro')
+    print('F1 score: %f' % f1)
+
+
+    evaluation.append((smoothing, accuracy, precision, recall, f1))
+    
+    smoothing /= 10.0
+
+    
+  print(evaluation)
+
+    
+
 
   # INVERTED_IDX_FILE = MY_DRIVE+'/store_index_naive_bayes.dat'
   print("Training done!!")
@@ -299,7 +333,7 @@ if __name__ == "__main__":
   # pickle.dump(nbc.cats_info,outfile)
   # outfile.close()
 
-  nbc.loadIndex()
+  # nbc.loadIndex()
 
 
   print("Saving done!!")
@@ -307,7 +341,7 @@ if __name__ == "__main__":
 
   # y_test = ['Apparel']
 
-  pclasses=nbc.test(X_test) #get predcitions for test set
-  print(pclasses)
-  test_acc=np.sum(pclasses==y_test)/len(y_test)
-  print(test_acc) 
+  # pclasses=nbc.test(X_test) #get predcitions for test set
+  # print(pclasses)
+  # test_acc=np.sum(pclasses==y_test)/len(y_test)
+  # print(test_acc) 
