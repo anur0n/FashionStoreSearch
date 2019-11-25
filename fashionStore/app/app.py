@@ -7,6 +7,7 @@ from dmrankedquery import QueryType, QueryHandler
 import dmnbclassifier
 from dmnbclassifier import NaiveBayesClassifier, productCategories
 #from tqdm import tqdm
+from werkzeug import secure_filename
 
 app = Flask(__name__)
 
@@ -98,6 +99,11 @@ def search(request):
                 docLengths = docLengths, terms = terms)
 
 
+def uploadImage():
+    f = request.files['file']
+    f.save(IMAGES_PATH+secure_filename(f.filename))
+    return render_template('search/index.html', opType = 'img_search', image = IMAGES_PATH+f.filename)
+
 IMAGES_PATH = 'static/images/'
 @app.route('/', methods=['GET', 'POST'])
 def submit():
@@ -117,6 +123,9 @@ def submit():
         elif request.form['action'] == 'Classify':
             print('Classify')
             return classify()
+        elif request.form['action'] == 'Image':
+            print('Upload image')
+            return uploadImage()
         else:
             print('Default')
             return search(request)

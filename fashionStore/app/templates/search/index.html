@@ -29,12 +29,26 @@
 							</div>
 						</div>
 				</form>
+				<form action = "/" method = "POST" 
+					enctype = "multipart/form-data">
+					<input type = "file" name = "file" />
+					<input type="submit" name="action" class="btn btn-info" value="Image" style="margin-left:5"></input>
+				</form>
             </div>
         </div>
     </div>
 </div>
+
+
+
+
 {% if opType is defined %}
-	{% if opType == 'classification'%}
+	{% if opType == 'img_search'%}
+		<div id=left>
+			<img src={{ image }} />
+		</div>
+	
+	{% elif opType == 'classification'%}
 		
 		<div class="card py-md-1 px-md-1 m-2">
 			<div class="card-body">

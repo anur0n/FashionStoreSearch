@@ -1,0 +1,2 @@
+model_checkpoint_path: "attention.gru"
+all_model_checkpoint_paths: "attention.gru"
