@@ -2,7 +2,7 @@ import csv
 #from tqdm import tqdm
 import os
 
-MY_DRIVE = os.getcwd() + '/app' #'/content/drive/My Drive/Data Mining'
+MY_DRIVE = os.getcwd() #+ '/app' #'/content/drive/My Drive/Data Mining'
 
 STYLE_WITH_DESC_N_TITLE = MY_DRIVE+'/styles_with_description_title.csv'
 

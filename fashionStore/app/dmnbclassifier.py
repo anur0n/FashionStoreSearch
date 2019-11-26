@@ -25,7 +25,7 @@ import pickle
 from nltk.stem import WordNetLemmatizer 
 # from DMRankedQuery import QueryType, QueryHandler
 
-MY_DRIVE_DATA_MINING = os.getcwd() + '/app' #'/content/drive/My Drive/Data Mining'
+MY_DRIVE_DATA_MINING = os.getcwd() #+ '/app' #'/content/drive/My Drive/Data Mining'
 
 STYLE_WITH_DESC_N_TITLE_SAMPLED = MY_DRIVE_DATA_MINING+'/styles_with_description_title_RandomSampled.csv'
 

@@ -3,9 +3,9 @@ import csv
 import os
 
 
-MY_DRIVE = os.getcwd() #+ '/app' #'/content/drive/My Drive/Data Mining'
+MY_DRIVE = os.getcwd() + '/captioning' #'/content/drive/My Drive/Data Mining'
 
-DIBA_DRIVE = os.getcwd() #+ '/app' #'/content/drive/My Drive/Rubel/DM/img_captioning'
+DIBA_DRIVE = os.getcwd() + '/captioning' #'/content/drive/My Drive/Rubel/DM/img_captioning'
 MY_DRIVE = DIBA_DRIVE
 
 FLICKR_FILE_GEN = DIBA_DRIVE+'/captions_sampled_generated.csv'

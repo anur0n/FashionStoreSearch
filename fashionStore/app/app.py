@@ -1,21 +1,37 @@
+import sys
+import os
+
+sys.path.append(os.getcwd()+'/captioning')
+
 from flask import Flask, render_template, request, jsonify
+
 import time
 import re
 import numpy as np
 from collections import defaultdict
 from dmrankedquery import QueryType, QueryHandler
+from dm_captioning_ranked_query import ImageQueryHandler
 import dmnbclassifier
 from dmnbclassifier import NaiveBayesClassifier, productCategories
+import dm_caption_evaluator as capgen
 #from tqdm import tqdm
 from werkzeug import secure_filename
+import datetime
+
+#import tensorflow as tsf
+
+# print(tsf.VERSION)
 
 app = Flask(__name__)
 
-queryHandler = QueryHandler()
-nbClassifier = NaiveBayesClassifier(productCategories)
+GITHUB_FLICKR_IMG_URL_BASE = 'https://raw.githubusercontent.com/anur0n/flicker-dataset-for-img-captioning/master/flickr10k_images/images/'
 
+queryHandler = QueryHandler()
+imgQueryHandler = ImageQueryHandler()
+nbClassifier = NaiveBayesClassifier(productCategories)
 isIndexLoaded = False
 isNBCIndexLoaded = False
+isImgIndexLoaded = False
 
 def highlight_terms(queryTerms, doc):
 
@@ -44,6 +60,8 @@ def classify():
         print('Index ..' + str(len(nbClassifier.cats_info)))
     print(productCategories)
     query = request.form['query']
+    if query == '':
+        return render_template('search/index.html', opType = 'classification', query='')
     print('searching ..' + query)
     
     terms = nbClassifier.getTerms(query)
@@ -74,6 +92,8 @@ def search(request):
         print('Index ..' + str(len(queryHandler.index)))
     print('Searching2')
     query = request.form['query']
+    if query == '':
+        return render_template('search/index.html', opType = 'search', query='')
     print('searching ..' + query)
     docs, tf_idf_scores, tf_scores, idf_scores = queryHandler.performQuery(query)
 
@@ -98,6 +118,50 @@ def search(request):
                 tf_idf_scores=tf_idf_scores, tf_scores = tf_scores, idf_scores = idf_scores, query = query, \
                 docLengths = docLengths, terms = terms)
 
+def image_search():
+    print('Image Searching')
+    global isImgIndexLoaded
+    if not isImgIndexLoaded:
+        imgQueryHandler.prepareParams()
+        imgQueryHandler.readIndex()
+        capgen.prepare_params()
+        isImgIndexLoaded = True
+        print('Index ..' + str(len(imgQueryHandler.index)))
+    print('Searching2')
+    query = request.form['query']
+    img_file = request.files['img_file'] if request.files.get('img_file') else None
+    if query == '' and img_file == None:
+        return render_template('search/index.html', opType = 'image_search', query='')
+    
+    if img_file != None:
+        img_file.save(TMP_IMAGE_PATH)
+        caption, _ = capgen.evaluate(TMP_IMAGE_PATH)
+        query = ' '.join(caption)
+        query = query.replace("<end>", "")
+
+    print('searching ..' + query)
+    docs, tf_idf_scores, tf_scores, idf_scores = imgQueryHandler.performQuery(query)
+
+    titles = [x.caption for x in docs]
+    image_urls = [GITHUB_FLICKR_IMG_URL_BASE + x.image for x in docs]
+    captions = [x.caption for x in docs]
+    docLengths = [len(x.split()) for x in captions]
+
+    terms = imgQueryHandler.getTerms(query)
+
+
+    for i, doc in enumerate(titles):
+        titles[i] = highlight_terms(terms, doc)
+
+    for i, doc in enumerate(captions):
+        captions[i] = highlight_terms(terms, doc)
+
+
+
+    outStr = ''
+    return render_template('search/index.html', opType = 'image_search', titles = titles, images = image_urls, captions = captions, \
+                tf_idf_scores=tf_idf_scores, tf_scores = tf_scores, idf_scores = idf_scores, query = query, \
+                docLengths = docLengths, terms = terms, query_img = TMP_IMAGE_PATH+'?'+str(datetime.datetime.now())) #To disable browser cache
 
 def uploadImage():
     f = request.files['file']
@@ -105,6 +169,7 @@ def uploadImage():
     return render_template('search/index.html', opType = 'img_search', image = IMAGES_PATH+f.filename)
 
 IMAGES_PATH = 'static/images/'
+TMP_IMAGE_PATH = IMAGES_PATH + 'tmp'
 @app.route('/', methods=['GET', 'POST'])
 def submit():
     # if 'query' in request.args:
@@ -123,6 +188,9 @@ def submit():
         elif request.form['action'] == 'Classify':
             print('Classify')
             return classify()
+        elif request.form['action'] == 'Image Search':
+            print('Image search')
+            return image_search()
         elif request.form['action'] == 'Image':
             print('Upload image')
             return uploadImage()

@@ -16,6 +16,40 @@
         #left, #middle, #right {display: inline-block; *display: inline; zoom: 1; vertical-align: top; font-size: 12px;}
         #left {width: 10%;}
         #right {width: 90%;}
+		
+		#grid {
+		  column-width: 300px;
+		  column-gap: 10px;
+		}
+
+		#grid > div {
+		  break-inside: avoid-column; /* Prevent element from breaking */
+		  page-break-inside: avoid; /* Prevent element from breaking in Firefox */
+		  margin-bottom: 10px;
+		}
+		
+		div.polaroid {
+		  width: 100%;
+		  background-color: white;
+		  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+		  margin-bottom: 25px;
+		}
+
+		div.container {
+		  text-align: center;
+		  padding: 10px 20px;
+		}
+
+		img {
+		  border: 1px solid #ddd;
+		  border-radius: 4px;
+		  padding: 5px;
+		  width: 100%;
+		}
+
+		img:hover {
+		  box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);
+		}
 
         body {
           background: #ffd89b;

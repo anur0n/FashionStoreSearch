@@ -37,9 +37,9 @@ from nltk.stem import WordNetLemmatizer
 forCaptioning = True
 ##############################
 
-MY_DRIVE = os.getcwd() #+ '/app' #'/content/drive/My Drive/Data Mining'
+MY_DRIVE = os.getcwd() + '/captioning' #+ '/app' #'/content/drive/My Drive/Data Mining'
 
-DIBA_DRIVE = os.getcwd() #+ '/app' #'/content/drive/My Drive/Rubel/DM/img_captioning'
+DIBA_DRIVE = os.getcwd() + '/captioning'#+ '/app' #'/content/drive/My Drive/Rubel/DM/img_captioning'
 MY_DRIVE = DIBA_DRIVE
 
 FLICKR_FILE_GEN = DIBA_DRIVE+'/captions_sampled_generated.csv'
@@ -62,7 +62,7 @@ class QueryType(Enum):
   FTQ = 2
   PhQ = 3
 
-class QueryHandler():
+class ImageQueryHandler():
   def __init__(self):
     self.index={}
     self.index={}
@@ -290,7 +290,7 @@ class QueryHandler():
 
 
 if __name__ == '__main__':
-  queryHandler = QueryHandler()
+  queryHandler = ImageQueryHandler()
   queryHandler.prepareParams()
   queryHandler.readIndex()
   result = queryHandler.performQuery('man surfing')
