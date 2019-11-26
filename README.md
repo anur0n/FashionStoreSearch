@@ -12,6 +12,8 @@ pip install numpy
 pip install nltk
 pip install scipy
 pip install sklearn
+pip install Flask-Images
+pip --default-timeout=60 install "tensorflow-gpu>=1.19,<2"
 ```
 
 
