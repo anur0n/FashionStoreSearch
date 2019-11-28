@@ -1,7 +1,7 @@
 import sys
 import os
-
-sys.path.append(os.getcwd()+'/captioning')
+# print(os.getcwd()+'/captioning/')
+sys.path.append(os.getcwd()+'/app/captioning/')
 
 from flask import Flask, render_template, request, jsonify
 
@@ -63,7 +63,7 @@ def classify():
     if query == '':
         return render_template('search/index.html', opType = 'classification', query='')
     print('searching ..' + query)
-    
+
     terms = nbClassifier.getTerms(query)
 
     categoryProb, term_freqs, logOfProb, priorProb, denom = nbClassifier.classify(query)
@@ -132,12 +132,13 @@ def image_search():
     img_file = request.files['img_file'] if request.files.get('img_file') else None
     if query == '' and img_file == None:
         return render_template('search/index.html', opType = 'image_search', query='')
-    
+
     if img_file != None:
         img_file.save(TMP_IMAGE_PATH)
         caption, _ = capgen.evaluate(TMP_IMAGE_PATH)
         query = ' '.join(caption)
         query = query.replace("<end>", "")
+        print('file saved to ' + TMP_IMAGE_PATH)
 
     print('searching ..' + query)
     docs, tf_idf_scores, tf_scores, idf_scores = imgQueryHandler.performQuery(query)
@@ -150,26 +151,19 @@ def image_search():
     terms = imgQueryHandler.getTerms(query)
 
 
-    for i, doc in enumerate(titles):
-        titles[i] = highlight_terms(terms, doc)
-
-    for i, doc in enumerate(captions):
-        captions[i] = highlight_terms(terms, doc)
-
-
 
     outStr = ''
     return render_template('search/index.html', opType = 'image_search', titles = titles, images = image_urls, captions = captions, \
                 tf_idf_scores=tf_idf_scores, tf_scores = tf_scores, idf_scores = idf_scores, query = query, \
-                docLengths = docLengths, terms = terms, query_img = TMP_IMAGE_PATH+'?'+str(datetime.datetime.now())) #To disable browser cache
+                docLengths = docLengths, terms = terms, query_img = TMP_IMAGE_PATH) #To disable browser cache
 
 def uploadImage():
     f = request.files['file']
     f.save(IMAGES_PATH+secure_filename(f.filename))
     return render_template('search/index.html', opType = 'img_search', image = IMAGES_PATH+f.filename)
 
-IMAGES_PATH = 'static/images/'
-TMP_IMAGE_PATH = IMAGES_PATH + 'tmp'
+IMAGES_PATH = '/static/images/'
+TMP_IMAGE_PATH = os.getcwd()+'/app/static/tmpfiles/tmp.jpg'
 @app.route('/', methods=['GET', 'POST'])
 def submit():
     # if 'query' in request.args:

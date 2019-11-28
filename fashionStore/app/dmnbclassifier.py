@@ -6,26 +6,27 @@ nltk.download('stopwords')
 nltk.download('wordnet')
 nltk.download('punkt')
 
-# import these modules 
-from nltk.stem import PorterStemmer 
+# import these modules
+from nltk.stem import PorterStemmer
 from nltk.tokenize import word_tokenize
 
 from collections import defaultdict
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from nltk.stem.snowball import SnowballStemmer
+from sklearn.model_selection import train_test_split
 from array import array
-from tqdm import tqdm
+#from tqdm import tqdm
 import csv
 import math
 import re
 import numpy as np
 import os
 import pickle
-from nltk.stem import WordNetLemmatizer 
+from nltk.stem import WordNetLemmatizer
 # from DMRankedQuery import QueryType, QueryHandler
 
-MY_DRIVE_DATA_MINING = os.getcwd() #+ '/app' #'/content/drive/My Drive/Data Mining'
+MY_DRIVE_DATA_MINING = os.getcwd() + '/app' #'/content/drive/My Drive/Data Mining'
 
 STYLE_WITH_DESC_N_TITLE_SAMPLED = MY_DRIVE_DATA_MINING+'/styles_with_description_title_RandomSampled.csv'
 
@@ -47,8 +48,8 @@ def preprocess_string(str_arg):
     cleaned_str=re.sub('[^a-z\s]+',' ',str_arg,flags=re.IGNORECASE) #every char except alphabets is replaced
     cleaned_str=re.sub('(\s+)',' ',cleaned_str) #multiple spaces are replaced by single space
     cleaned_str=cleaned_str.lower() #converting the cleaned string to lower case
-    
-    return cleaned_str # returning the preprocessed string 
+
+    return cleaned_str # returning the preprocessed string
 
 class NaiveBayesClassifier:
   def __init__(self, categories):
@@ -61,7 +62,7 @@ class NaiveBayesClassifier:
     self.dataFile = STYLE_WITH_DESC_N_TITLE
     # self.indexFile = INVERTED_IDX_FILE
     self.stemmer = PorterStemmer() # SnowballStemmer('english')
-    self.lemmatizer = WordNetLemmatizer() 
+    self.lemmatizer = WordNetLemmatizer()
 
   def getTerms(self, doc):
     #print('Original\n'+doc)
@@ -69,7 +70,7 @@ class NaiveBayesClassifier:
     #print('lowered\n\n'+doc)
     doc = re.sub(r'[^a-z0-9 ]',' ',doc) #put spaces instead of non-alphanumeric characters
     terms = doc.split()
-    
+
     terms = [term for term in terms if term not in self.stopwords]
 #     terms = [self.lemmatizer.lemmatize(term) for term in terms]
     terms = [self.stemmer.stem(term) for term in terms]
@@ -78,7 +79,7 @@ class NaiveBayesClassifier:
     return terms
 
   def addToIndex(self, products_of_category, category):
-    counter = 0  
+    counter = 0
     for product in products_of_category: #for every word in preprocessed example
       token_words = self.getTerms(product)
       for token in token_words:
@@ -97,7 +98,7 @@ class NaiveBayesClassifier:
     #     print(i)
     self.index = np.array([defaultdict(int) for i in range(self.categories.shape[0])])
     # print(len(self.labels))
-    
+
     for idx, category in enumerate(self.categories):
       all_category_products = [x for x, label in zip(self.productDescriptions, self.labels) if label == category]
 
@@ -109,7 +110,7 @@ class NaiveBayesClassifier:
       # print(category + ' ' + str(len(cleaned_desc)))
 
       np.apply_along_axis(self.addToIndex,0,cleaned_desc,idx)
-      
+
       pass
 
     # print(self.index)
@@ -124,33 +125,33 @@ class NaiveBayesClassifier:
     cat_word_counts = np.empty(self.categories.shape[0])
     # print(cat_word_counts)
     for cat_index,cat in enumerate(self.categories):
-        
+
         #Calculating prior probability p(c) for each class
         all_category_products = [x for x, label in zip(self.productDescriptions, self.labels) if label == cat]
         # print(len(all_category_products))
         probability_classes[cat_index] = len(all_category_products) / len(self.labels)
-        
+
         # print(':::->'+(str(list(self.index[cat_index].values()))))
-        #Calculating total counts of all the words of each class 
+        #Calculating total counts of all the words of each class
         cat_word_counts[cat_index] = np.sum(np.array(list(self.index[cat_index].values())))+self.smoothing # |v| is remaining to be added
-        
-        #get all words of this category                                
+
+        #get all words of this category
         all_words+=self.index[cat_index].keys()
-                                                  
-    
+
+
     #combine all words of every category & make them unique to get vocabulary -V- of entire training set
-    
+
     self.vocab=np.unique(np.array(all_words))
     self.vocab_length=self.vocab.shape[0]
     # print(self.vocab_length)
-    #computing denominator value                                      
+    #computing denominator value
     denoms=np.array([cat_word_counts[cat_index]+self.vocab_length+1 for cat_index,cat in enumerate(self.categories)])
 
     # print(denoms)
 
     self.cats_info=[(self.index[cat_index],probability_classes[cat_index],denoms[cat_index]) for cat_index,cat in enumerate(self.categories)]
     # print(type(self.index[0]))
-    # self.cats_info=[[(self.index[cat_index])] for cat_index,cat in enumerate(self.categories)]                               
+    # self.cats_info=[[(self.index[cat_index])] for cat_index,cat in enumerate(self.categories)]
     self.cats_info=np.array(self.cats_info)
 
     # outfile = open(INVERTED_IDX_FILE,'wb')
@@ -167,32 +168,32 @@ class NaiveBayesClassifier:
   ## Test ##
   def classify(self,test_example):
       likelihood_prob=np.zeros(self.categories.shape[0]) #to store probability w.r.t each class
-      
+
       terms = self.getTerms(test_example)
       #finding probability w.r.t each class of the given test example
-      for cat_index,cat in enumerate(self.categories): 
-                            
+      for cat_index,cat in enumerate(self.categories):
+
           for test_token in terms: #split the test example and get p of each test word
-              
+
               ####################################################################################
-                                            
-              #This loop computes : for each word w [ count(w|c)+1 ] / [ count(c) + |V| + 1 ]                               
-                                            
-              ####################################################################################                              
-              
-              #get total count of this test token from it's respective training dict to get numerator value  
+
+              #This loop computes : for each word w [ count(w|c)+1 ] / [ count(c) + |V| + 1 ]
+
+              ####################################################################################
+
+              #get total count of this test token from it's respective training dict to get numerator value
               # print(type(self.cats_info[cat_index][0]))
               test_token_counts=self.cats_info[cat_index][0].get(test_token,0)+self.smoothing
-              
-              #now get likelihood of this test_token word                              
+
+              #now get likelihood of this test_token word
               test_token_prob=test_token_counts/float(self.cats_info[cat_index][2])
-              
+
               #remember why taking log? To prevent underflow!
               likelihood_prob[cat_index]+=np.log(test_token_prob)
-                                            
+
       # we have likelihood estimate of the given example against every class but we need posterior probility
       post_prob=np.empty(self.categories.shape[0])
-        
+
       for cat_index,cat in enumerate(self.categories):
           post_prob[cat_index]=likelihood_prob[cat_index]+np.log(self.cats_info[cat_index][1])
 
@@ -202,44 +203,44 @@ class NaiveBayesClassifier:
         #sortedCategory = sortedCategory.sort().reverse()
         #result = [str(category + '=' + str(prob)) for prob, category in sortedCategory]
       sortedProb, sortedCategory = zip(*sortedCategory)
-      
+
       mxCategory = 0;
       mxProb = -float("inf")
       for idx, category in enumerate(self.categories):
         if post_prob[idx] > mxProb:
             mxProb = post_prob[idx]
             mxCategory = idx
-            
+
       term_freq_max_category = np.empty(len(terms))
       print(len(terms))
       print(len(term_freq_max_category))
       term_freq_max_category_log = np.empty(len(terms))
       logOfTermProbabilities = np.empty(len(terms))
-      
+
       print(self.categories[mxCategory])
       for idx, term in enumerate(terms):
         term_freq_max_category[idx] = (self.cats_info[mxCategory][0].get(term,0)+self.smoothing)
         logOfTermProbabilities[idx] = np.log((self.cats_info[mxCategory][0].get(term,0)+self.smoothing) / float(self.cats_info[mxCategory][2]))
-    
+
       return (post_prob, term_freq_max_category, logOfTermProbabilities, np.log(self.cats_info[mxCategory][1]), float(self.cats_info[mxCategory][2]))
-    
-   
+
+
   def test(self,test_set):
     predictions=[] #to store prediction of each test example
-    for example in test_set: 
-                                          
-        #preprocess the test example the same way we did for training set exampels                                  
-        cleaned_example=preprocess_string(example) 
-          
-        #simply get the posterior probability of every example                                  
+    for example in test_set:
+
+        #preprocess the test example the same way we did for training set exampels
+        cleaned_example=preprocess_string(example)
+
+        #simply get the posterior probability of every example
         post_prob, _, _, _, _ =self.classify(cleaned_example) #get prob of this example for both classes
-        
+
         #simply pick the max value and map against self.classes!
         predictions.append(self.categories[np.argmax(post_prob)])
         # print(len(predictions))
-            
+
     return np.array(predictions)
-    
+
   def loadIndex(self):
     infile = open(INVERTED_IDX_FILE,'rb')
     categoryIndex = pickle.load(infile)
@@ -251,7 +252,7 @@ class NaiveBayesClassifier:
 def loadData():
   with open(STYLE_WITH_DESC_N_TITLE, 'r', encoding='latin-1') as csvfile:
       reader = csv.reader(csvfile)
-      
+
       descriptions = []
       labels = []
 
@@ -265,7 +266,6 @@ def loadData():
         #   print(rowNo)
   return (descriptions, labels, np.unique(np.array(labels)))
 
-from sklearn.model_selection import train_test_split
 
 def splitData(data, label):
    X_train, X_test, y_train, y_test = train_test_split(data, label, test_size=0.40, random_state=42)
@@ -280,7 +280,7 @@ productCategories = np.array(['Accessories', 'Apparel', 'Footwear', 'Free Items'
  'Sporting Goods'])
 
 
-# import 
+# import
 if __name__ == "__main__":
   descriptions, labels, categories = loadData()
   X_train, X_test, y_train, y_test = splitData(descriptions, labels)
@@ -316,13 +316,13 @@ if __name__ == "__main__":
 
 
     evaluation.append((smoothing, accuracy, precision, recall, f1))
-    
+
     smoothing /= 10.0
 
-    
+
   print(evaluation)
 
-    
+
 
 
   # INVERTED_IDX_FILE = MY_DRIVE+'/store_index_naive_bayes.dat'
@@ -344,4 +344,4 @@ if __name__ == "__main__":
   # pclasses=nbc.test(X_test) #get predcitions for test set
   # print(pclasses)
   # test_acc=np.sum(pclasses==y_test)/len(y_test)
-  # print(test_acc) 
+  # print(test_acc)

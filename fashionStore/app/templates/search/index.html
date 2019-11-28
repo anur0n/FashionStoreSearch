@@ -6,7 +6,7 @@
 <div class="row mb-12">
     <div class="col-lg-12 w-100" style="background-color: #FFF">
         <div class="col-lg-6">
-            <div class="bg-white p-4 rounded shadow" style="padding-bottom: 0px;">				
+            <div class="bg-white p-4 rounded shadow" style="padding-bottom: 0px;">
 				<form class="inline" action="/" method="POST" enctype = "multipart/form-data" style="margin-bottom: 0px;">
 						<div class="input-group mb-4 border rounded-pill p-1">
 							<input
@@ -37,7 +37,7 @@
 						{% endif %}
 						{% endif %}
 				</form>
-				
+
             </div>
         </div>
     </div>
@@ -51,7 +51,7 @@
 		{% if query_img is defined %}
 			<div id="grid" style="column-width : 500px; margin:0 auto; ! important;">
 				<div class="polaroid">
-					<img src="{{ query_img }}?nocache=<?php echo time(); ?>" />
+					<img src="{{ query_img }}" />
 					<div class="container">
 						<p>{{query}}</p>
 					</div>
@@ -81,7 +81,7 @@
 					</div>
 				</div>
 			</div>
-			
+
 			<div class="card py-md-1 px-md-1 m-2 mb-4" width="">
 				<div class="card-body">
 					<!--<span class="pull-right">-->
@@ -101,7 +101,7 @@
 										  </div>
 										  <br>
 									  <!--{% endif %}-->
-								  {% endfor %}   
+								  {% endfor %}
 								</div>
 							{% endif %}
 
@@ -140,7 +140,7 @@
 					</span>
 				</div>
 			</div>
-			
+
 			<div class="card py-md-1 px-md-1 m-2">
 				<div class="card-body">
 					<div>
@@ -153,7 +153,7 @@
 								<th align="center">No of Terms in '{{detectedCategory}}' + |Vocab|</th>
 								<th align="center">p(term|'{{detectedCategory}}')</th>
 								<th align="center">log(p(term|'{{detectedCategory}}'))</th>
-								
+
 							</tr>
 							{% for j in range(0, terms|length) %}
 
@@ -168,7 +168,7 @@
 							<tr>
 								<th align="center" colspan="4">Total : <br>log(p({{detectedCategory}})) = {{priorProb}} <br>+<br> sum(log(p(term|'{{detectedCategory}}')))</th>
 								<th align="center">{{'%f'| format(totalScore|float)}}</th>
-								
+
 							</tr>
 						</table>
 
@@ -176,10 +176,10 @@
 				</div>
 			</div>
 		{% endif %}
-	
-	
+
+
 	{% elif opType == 'search' %}
-	
+
 		{% if query == '' %}
 			<h5 style="font-size: 20px; padding: 2px; margin: 5px;"><font color="white">Empty query</font></h5>
 		{% else %}
@@ -241,7 +241,7 @@
 			</section>
 			{% endif %}
 		{% endif %}
-	
+
 	{% endif %}
 {% endif %}
 

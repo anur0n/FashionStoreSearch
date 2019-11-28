@@ -30,7 +30,7 @@ from PIL import Image
 import pickle
 
 
-MODEL_FILE_PATH = os.getcwd()+'/captioning/model_data/'
+MODEL_FILE_PATH = os.getcwd()+'/app/captioning/model_data/'
 
 max_length = 0
 attention_features_shape = 0
@@ -80,7 +80,7 @@ def prepare_params():
     encoder = CNN_Encoder(embedding_dim)
     decoder = RNN_Decoder(embedding_dim, units, vocab_size)
 
-    image_model = tf.keras.applications.InceptionV3(include_top=False, 
+    image_model = tf.keras.applications.InceptionV3(include_top=False,
                                                     weights='imagenet')
 
 
@@ -93,45 +93,45 @@ def prepare_params():
     decoder.attention.load_weights(MODEL_FILE_PATH+'attention.gru')
 
 def gru(units):
-  # If you have a GPU, we recommend using the CuDNNGRU layer (it provides a 
+  # If you have a GPU, we recommend using the CuDNNGRU layer (it provides a
   # significant speedup).
   if tf.test.is_gpu_available():
-    return tf.keras.layers.CuDNNGRU(units, 
-                                    return_sequences=True, 
-                                    return_state=True, 
+    return tf.keras.layers.CuDNNGRU(units,
+                                    return_sequences=True,
+                                    return_state=True,
                                     recurrent_initializer='glorot_uniform')
   else:
-    return tf.keras.layers.GRU(units, 
-                               return_sequences=True, 
-                               return_state=True, 
-                               recurrent_activation='sigmoid', 
+    return tf.keras.layers.GRU(units,
+                               return_sequences=True,
+                               return_state=True,
+                               recurrent_activation='sigmoid',
                                recurrent_initializer='glorot_uniform')
-    
+
 class BahdanauAttention(tf.keras.Model):
   def __init__(self, units):
     super(BahdanauAttention, self).__init__()
     self.W1 = tf.keras.layers.Dense(units)
     self.W2 = tf.keras.layers.Dense(units)
     self.V = tf.keras.layers.Dense(1)
-  
+
   def call(self, features, hidden):
     # features(CNN_encoder output) shape == (batch_size, 64, embedding_dim)
-    
+
     # hidden shape == (batch_size, hidden_size)
     # hidden_with_time_axis shape == (batch_size, 1, hidden_size)
     hidden_with_time_axis = tf.expand_dims(hidden, 1)
-    
+
     # score shape == (batch_size, 64, hidden_size)
     score = tf.nn.tanh(self.W1(features) + self.W2(hidden_with_time_axis))
-    
+
     # attention_weights shape == (batch_size, 64, 1)
     # we get 1 at the last axis because we are applying score to self.V
     attention_weights = tf.nn.softmax(self.V(score), axis=1)
-    
+
     # context_vector shape after sum == (batch_size, hidden_size)
     context_vector = attention_weights * features
     context_vector = tf.reduce_sum(context_vector, axis=1)
-    
+
     return context_vector, attention_weights
 
 class CNN_Encoder(tf.keras.Model):
@@ -141,7 +141,7 @@ class CNN_Encoder(tf.keras.Model):
         super(CNN_Encoder, self).__init__()
         # shape after fc == (batch_size, 64, embedding_dim)
         self.fc = tf.keras.layers.Dense(embedding_dim)
-        
+
     def call(self, x):
         x = self.fc(x)
         x = tf.nn.relu(x)
@@ -156,28 +156,28 @@ class RNN_Decoder(tf.keras.Model):
     self.gru = gru(self.units)
     self.fc1 = tf.keras.layers.Dense(self.units)
     self.fc2 = tf.keras.layers.Dense(vocab_size)
-    
+
     self.attention = BahdanauAttention(self.units)
-        
+
   def call(self, x, features, hidden):
     # defining attention as a separate model
     context_vector, attention_weights = self.attention(features, hidden)
-    
+
     # x shape after passing through embedding == (batch_size, 1, embedding_dim)
     x = self.embedding(x)
-    
+
     # x shape after concatenation == (batch_size, 1, embedding_dim + hidden_size)
     x = tf.concat([tf.expand_dims(context_vector, 1), x], axis=-1)
-    
+
     # passing the concatenated vector to the GRU
     output, state = self.gru(x)
-    
+
     # shape == (batch_size, max_length, hidden_size)
     x = self.fc1(output)
-    
+
     # x shape == (batch_size * max_length, hidden_size)
     x = tf.reshape(x, (-1, x.shape[2]))
-    
+
     # output shape == (batch_size * max_length, vocab)
     x = self.fc2(x)
 
@@ -235,7 +235,7 @@ def plot_attention(image, result, attention_plot):
     temp_image = np.array(Image.open(image))
 
     fig = plt.figure(figsize=(10, 10))
-    
+
     len_result = len(result)
     for l in range(len_result):
         temp_att = np.resize(attention_plot[l], (8, 8))
@@ -254,7 +254,7 @@ def plot_attention(image, result, attention_plot):
 # # image_url = '/content/4576671.jpg'
 # # image_url = '/content/65567.jpg'
 # image_extension = image_url[-4:]
-# image_path = tf.keras.utils.get_file('image3'+image_extension, 
+# image_path = tf.keras.utils.get_file('image3'+image_extension,
 #                                      origin=image_url)
 # print(image_path)
 # result, attention_plot = evaluate(image_path)
@@ -286,7 +286,7 @@ def plot_attention(image, result, attention_plot):
 # with open(FLICKR_FILE,'r', encoding="latin-1") as csvinput:
 #         with open(FLICKR_FILE_GEN, 'w', newline='', encoding="latin-1") as csvoutput:
 #             writer = csv.writer(csvoutput, lineterminator='\n')
-#             reader = csv.reader(csvinput) 
+#             reader = csv.reader(csvinput)
 
 #             all = []
 #             row = next(reader)
@@ -300,12 +300,12 @@ def plot_attention(image, result, attention_plot):
 #               image_path = FILE_IN_PATH+row[0]
 #               # print(image_path)
 #               result, _ = evaluate2(image_path)
-              
+
 #               caption = ' '.join(result)
 #               if len(result) == max_length:
 #                 print('error?')
 #                 print(caption)
-              
+
 #               if i%100 == 0:
 #                 print(caption)
 #                 #print(fileName)
