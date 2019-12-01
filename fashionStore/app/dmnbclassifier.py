@@ -268,13 +268,16 @@ def loadData():
 
 
 def splitData(data, label):
-   X_train, X_test, y_train, y_test = train_test_split(data, label, test_size=0.40, random_state=42)
+   X_train, X_test, y_train, y_test = train_test_split(data, label, test_size=0.20, random_state=42)
+   X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.20, random_state=42)
    print(len(X_train))
    print(len(y_train))
    print(len(X_test))
    print(len(y_test))
+   print(len(X_val))
+   print(len(y_val))
 
-   return (X_train, X_test, y_train, y_test)
+   return (X_train, X_test, X_val, y_train, y_test, y_val)
 
 productCategories = np.array(['Accessories', 'Apparel', 'Footwear', 'Free Items', 'Home', 'Personal Care',
  'Sporting Goods'])
@@ -288,39 +291,60 @@ if __name__ == "__main__":
 
   print(len(descriptions))
   evaluation = []
-  smoothing = 100.0
 
-  for i in range(15):
-    nbc = NaiveBayesClassifier(productCategories)
-    nbc.smoothing = smoothing
+#   smoothing = 100.0
 
-    nbc.train(X_train,y_train)
+#   for i in range(15):
+#     nbc = NaiveBayesClassifier(productCategories)
+#     nbc.smoothing = smoothing
 
-    pclasses=nbc.test(X_test) #get predcitions for test set
-    # print(pclasses)
-    test_acc=np.sum(pclasses==y_test)/len(y_test)
+#     nbc.train(X_train,y_train)
 
-    print('For '+str(smoothing)+' : ')
-    # accuracy: (tp + tn) / (p + n)
-    accuracy = accuracy_score(y_test, pclasses)
-    print('Accuracy: %f' % accuracy)
-    # precision tp / (tp + fp)
-    precision = precision_score(y_test, pclasses, average='macro')
-    print('Precision: %f' % precision)
-    # recall: tp / (tp + fn)
-    recall = recall_score(y_test, pclasses, average='macro')
-    print('Recall: %f' % recall)
-    # f1: 2 tp / (2 tp + fp + fn)
-    f1 = f1_score(y_test, pclasses, average='macro')
-    print('F1 score: %f' % f1)
+#     pclasses=nbc.test(X_val) #get predcitions for test set
+#     # print(pclasses)
 
-
-    evaluation.append((smoothing, accuracy, precision, recall, f1))
-
-    smoothing /= 10.0
+#     print('For '+str(smoothing)+' : ')
+#     # accuracy: (tp + tn) / (p + n)
+#     accuracy = accuracy_score(y_val, pclasses)
+#     print('Accuracy: %f' % accuracy)
+#     # precision tp / (tp + fp)
+#     precision = precision_score(y_val, pclasses, average='macro')
+#     print('Precision: %f' % precision)
+#     # recall: tp / (tp + fn)
+#     recall = recall_score(y_val, pclasses, average='macro')
+#     print('Recall: %f' % recall)
+#     # f1: 2 tp / (2 tp + fp + fn)
+#     f1 = f1_score(y_val, pclasses, average='macro')
+#     print('F1 score: %f' % f1)
 
 
-  print(evaluation)
+#     evaluation.append((smoothing, accuracy, precision, recall, f1))
+
+#     smoothing /= 10.0
+
+#   print(evaluation)
+
+#   print('##################Validating on validation set.###################')
+#   smoothing = 1
+#   nbc = NaiveBayesClassifier(productCategories)
+#   nbc.smoothing = smoothing
+#   nbc.train(X_train,y_train)
+#   pclasses=nbc.test(X_test) #get predcitions for test set
+#   # print(pclasses)
+
+#   print('For '+str(smoothing)+' : ')
+#   # accuracy: (tp + tn) / (p + n)
+#   accuracy = accuracy_score(y_test, pclasses)
+#   print('Accuracy: %f' % accuracy)
+#   # precision tp / (tp + fp)
+#   precision = precision_score(y_test, pclasses, average='macro')
+#   print('Precision: %f' % precision)
+#   # recall: tp / (tp + fn)
+#   recall = recall_score(y_test, pclasses, average='macro')
+#   print('Recall: %f' % recall)
+#   # f1: 2 tp / (2 tp + fp + fn)
+#   f1 = f1_score(y_test, pclasses, average='macro')
+#   print('F1 score: %f' % f1)
 
 
 

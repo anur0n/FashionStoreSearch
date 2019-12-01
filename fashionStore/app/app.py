@@ -155,7 +155,7 @@ def image_search():
     outStr = ''
     return render_template('search/index.html', opType = 'image_search', titles = titles, images = image_urls, captions = captions, \
                 tf_idf_scores=tf_idf_scores, tf_scores = tf_scores, idf_scores = idf_scores, query = query, \
-                docLengths = docLengths, terms = terms, query_img = TMP_IMAGE_PATH) #To disable browser cache
+                docLengths = docLengths, terms = terms, query_img = '/static/tmpfiles/tmp.jpg'+'?'+str(datetime.datetime.now())) #To disable browser cache
 
 def uploadImage():
     f = request.files['file']
