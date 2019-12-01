@@ -36,3 +36,8 @@ pip --default-timeout=60 install "tensorflow-gpu>=1.19,<2"
 * **docRetriever.py** Utility file that returns the original product data based on document Ids.
 * **dmsearchranked.py** This file creates the inverted index and tf idf, and stores in a file.
 * **dmnbclassifier.py** This file creates the inverted index, saves and loads from file. And handles classification requests and returns classification results.
+* **captioning_doc_retriever.py** This file fetch the image file info based on id.
+* **dm_caption_evaluator.py** Generates the caption based on pretrained model weights.
+* **dm_captioning_ranked_query.py** Handles image search requests.
+
+**model_data** folder contains the image-captioning model weights and save files.
