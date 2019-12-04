@@ -296,11 +296,19 @@ class ImageQueryHandler():
     # print(idf_scores)
 
     docItems = docRetriever.retrieveDocs(docIds)
+
+    docItemsSorted = []
+    for docIndex, (score, doc, tf, idf) in enumerate(docs):
+        for docItem in docItems:
+            if int(docItem.id[:-4]) == doc:
+                docItemsSorted.append(docItem);
+
+    # print(docItemsSorted)
     # print(docItems)
 
 
 
-    return (docItems, tf_idf_scores, tf_scores, idf_scores)
+    return (docItemsSorted, tf_idf_scores, tf_scores, idf_scores)
 
 
 if __name__ == '__main__':

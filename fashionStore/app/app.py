@@ -176,7 +176,7 @@ def uploadImage():
     return render_template('search/index.html', opType = 'img_search', image = IMAGES_PATH+f.filename)
 
 IMAGES_PATH = '/static/images/'
-TMP_IMAGE_PATH = os.getcwd()+'/app/static/tmpfiles/tmp.jpg'
+TMP_IMAGE_PATH = file_path +'/static/tmpfiles/tmp.jpg'
 @app.route('/', methods=['GET', 'POST'])
 def submit():
     # if 'query' in request.args:
