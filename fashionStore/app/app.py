@@ -1,7 +1,13 @@
+#!/home/anur0nArm/.virtualenvs/fstore/bin/python
 import sys
 import os
-# print(os.getcwd()+'/captioning/')
-sys.path.append(os.getcwd()+'/app/captioning/')
+
+print(sys.version)
+
+file_path = os.path.dirname(os.path.realpath(__file__))
+
+# print(file_path)
+sys.path.append(file_path + '/captioning/')
 
 from flask import Flask, render_template, request, jsonify
 
@@ -17,6 +23,8 @@ import dm_caption_evaluator as capgen
 #from tqdm import tqdm
 from werkzeug import secure_filename
 import datetime
+
+import threading
 
 #import tensorflow as tsf
 
@@ -122,6 +130,7 @@ def image_search():
     print('Image Searching')
     global isImgIndexLoaded
     if not isImgIndexLoaded:
+        print('Loading indices')
         imgQueryHandler.prepareParams()
         imgQueryHandler.readIndex()
         capgen.prepare_params()
@@ -132,20 +141,24 @@ def image_search():
     img_file = request.files['img_file'] if request.files.get('img_file') else None
     if query == '' and img_file == None:
         return render_template('search/index.html', opType = 'image_search', query='')
-
+    query_img = ''
     if img_file != None:
+        print('Saving file to: ' + TMP_IMAGE_PATH)
         img_file.save(TMP_IMAGE_PATH)
+        print('file saved to ' + TMP_IMAGE_PATH)
+        print('Generating caption')
         caption, _ = capgen.evaluate(TMP_IMAGE_PATH)
         query = ' '.join(caption)
         query = query.replace("<end>", "")
-        print('file saved to ' + TMP_IMAGE_PATH)
+        query_img = '/static/tmpfiles/tmp.jpg'+'?'+str(datetime.datetime.now()) #To disable browser cache
+        print('Caption: ' + query)
 
     print('searching ..' + query)
     docs, tf_idf_scores, tf_scores, idf_scores = imgQueryHandler.performQuery(query)
 
     titles = [x.caption for x in docs]
     image_urls = [GITHUB_FLICKR_IMG_URL_BASE + x.image for x in docs]
-    captions = [x.caption for x in docs]
+    captions = [x.caption.replace("<end>", "") for x in docs]
     docLengths = [len(x.split()) for x in captions]
 
     terms = imgQueryHandler.getTerms(query)
@@ -155,7 +168,7 @@ def image_search():
     outStr = ''
     return render_template('search/index.html', opType = 'image_search', titles = titles, images = image_urls, captions = captions, \
                 tf_idf_scores=tf_idf_scores, tf_scores = tf_scores, idf_scores = idf_scores, query = query, \
-                docLengths = docLengths, terms = terms, query_img = '/static/tmpfiles/tmp.jpg'+'?'+str(datetime.datetime.now())) #To disable browser cache
+                docLengths = docLengths, terms = terms, query_img = query_img)
 
 def uploadImage():
     f = request.files['file']
@@ -203,11 +216,30 @@ def submit():
 #def index():
  #   return str(queryHandler.performQuery(' toy'))
 
-if __name__ == '__main__':
+def preloadIndices():
+    print('Loading indices')
     queryHandler.prepareParams()
+    queryHandler.prepareParams()
+    queryHandler.readIndex()
+    isIndexLoaded = True
+
+    nbClassifier.loadIndex()
+    isNBCIndexLoaded = True
+
+
+    imgQueryHandler.prepareParams()
+    imgQueryHandler.readIndex()
+    capgen.prepare_params()
+    isImgIndexLoaded = True
     # queryHandler.readIndex()
     # queryHandler.performQuery('Blue check shirt')
-    print(highlight_terms(queryHandler.getTerms("blue narrow"), 'Blue narrowed check shirt blue'))
-    print('Search complete')
+    # print(highlight_terms(queryHandler.getTerms("blue narrow"), 'Blue narrowed check shirt blue'))
+    print('Service loaded successfully')
+# if __name__ == '__main__':
 
-    app.run()
+# preloading_thread = threading.Thread(target=preloadIndices)
+# preloading_thread.start()
+
+print('App loaded')
+
+    # app.run()

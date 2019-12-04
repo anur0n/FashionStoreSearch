@@ -11,8 +11,8 @@ Original file is located at
 #drive.mount('/content/drive')
 
 import nltk
-nltk.download('stopwords')
-nltk.download('wordnet')
+# nltk.download('stopwords')
+# nltk.download('wordnet')
 
 from collections import defaultdict
 from nltk.corpus import stopwords
@@ -33,7 +33,9 @@ from docRetriever import DocRetriever
 import numpy as np
 from nltk.stem import WordNetLemmatizer
 
-MY_DRIVE = os.getcwd() #'/content/drive/My Drive/Data Mining'
+file_path = os.path.dirname(os.path.realpath(__file__))
+
+MY_DRIVE = file_path #os.getcwd() #'/content/drive/My Drive/Data Mining'
 
 STYLE_WITH_DESC_N_TITLE = MY_DRIVE+'/styles_with_description_title.csv'
 

@@ -58,6 +58,14 @@
 				</div>
 			</div>
 			<br>
+		{% elif queyr is defined %}
+		    <div class="card py-md-1 px-md-1 m-2">
+				<div class="card-body">
+					<div>
+						<p class="card-text">Showing result for: <font color="#1A4373" size="5"><br><br><i>"{{query|safe}}"</i></font></p>
+					</div>
+				</div>
+			</div>
 		{% endif %}
 		{% if query == '' %}
 			<h5 style="font-size: 20px; padding: 2px; margin: 5px;"><font color="white">Empty query</font></h5>
@@ -66,6 +74,36 @@
 			{% for i in range(0, images|length) %}
 				<div class="polaroid">
 					<img src={{ images[i] }} />
+					<div>
+						<b><i>Caption:   {{captions[i]}}</i></b>
+					</div>
+					<div>
+						<b><i>Total tf-idf Score:   {{'%0.4f'| format(tf_idf_scores[i]|float)}}</i></b>
+						<br>
+						<b><i>Document length:   {{docLengths[i]}}</i></b>
+						<br><br>
+					</div>
+					<div>
+
+						<table style="width:100%">
+							<tr>
+								<th>Query terms</th>
+								<th>tf-score</th>
+								<th>idf-score</th>
+								<th>tf-idf</th>
+							</tr>
+							{% for j in range(0, terms|length) %}
+
+								<tr>
+									<td>{{terms[j]}}</td>
+									<td>{{'%0.4f'| format(tf_scores[i][j]|float)}}</td>
+									<td>{{'%0.4f'| format(idf_scores[i][j]|float)}}</td>
+									<td>{{'%0.4f'| format((tf_scores[i][j] * idf_scores[i][j])|float)}}</td>
+								</tr>
+							{% endfor %}
+						</table>
+
+					</div>
 				</div>
 			{% endfor %}
 			</div>

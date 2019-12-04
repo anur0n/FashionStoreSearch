@@ -29,8 +29,9 @@ from glob import glob
 from PIL import Image
 import pickle
 
+file_path = os.path.dirname(os.path.realpath(__file__))
 
-MODEL_FILE_PATH = os.getcwd()+'/app/captioning/model_data/'
+MODEL_FILE_PATH = file_path + '/model_data/'
 
 max_length = 0
 attention_features_shape = 0
@@ -91,6 +92,7 @@ def prepare_params():
     encoder.load_weights(MODEL_FILE_PATH+'encoder.gru')
     decoder.load_weights(MODEL_FILE_PATH+'decoder.gru')
     decoder.attention.load_weights(MODEL_FILE_PATH+'attention.gru')
+    print('Caption generator params loaded')
 
 def gru(units):
   # If you have a GPU, we recommend using the CuDNNGRU layer (it provides a
@@ -189,20 +191,28 @@ class RNN_Decoder(tf.keras.Model):
 
 def load_image(image_path):
     # print(image_path)
+    print('Loading image from : ' + image_path)
     img = tf.read_file(image_path)
+    print('Decoding image from : ' + image_path)
     img = tf.image.decode_jpeg(img, channels=3)
+    print('Resizing image from : ' + image_path)
     img = tf.image.resize_images(img, (299, 299))
+    print('Preprocessing image from : ' + image_path)
     img = tf.keras.applications.inception_v3.preprocess_input(img)
+    print('Preprocessing Done')
     return img, image_path
 
 
 def evaluate(image):
+    print('Generating caption in evaluate function')
     attention_plot = np.zeros((max_length, attention_features_shape))
-
+    print('Generating caption in evaluate function2')
     hidden = decoder.reset_state(batch_size=1)
-
+    print('Generating caption in evaluate function3')
     temp_input = tf.expand_dims(load_image(image)[0], 0)
+    print('Generating caption in evaluate function4')
     img_tensor_val = image_features_extract_model(temp_input)
+    print('Generating caption in evaluate function5')
     img_tensor_val = tf.reshape(img_tensor_val, (img_tensor_val.shape[0], -1, img_tensor_val.shape[3]))
 
     features = encoder(img_tensor_val)
@@ -214,7 +224,7 @@ def evaluate(image):
     # print(dec_input)
 
     # print(decoder.attention.W1)
-
+    print('Entering caption generation loop')
     for i in range(max_length):
         predictions, hidden, attention_weights = decoder(dec_input, features, hidden)
         # print(predictions)

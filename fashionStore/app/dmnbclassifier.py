@@ -2,9 +2,9 @@
 # %cd "drive/My Drive/Colab Notebooks"
 
 import nltk
-nltk.download('stopwords')
-nltk.download('wordnet')
-nltk.download('punkt')
+# nltk.download('stopwords')
+# nltk.download('wordnet')
+# nltk.download('punkt')
 
 # import these modules
 from nltk.stem import PorterStemmer
@@ -26,7 +26,9 @@ import pickle
 from nltk.stem import WordNetLemmatizer
 # from DMRankedQuery import QueryType, QueryHandler
 
-MY_DRIVE_DATA_MINING = os.getcwd() + '/app' #'/content/drive/My Drive/Data Mining'
+file_path = os.path.dirname(os.path.realpath(__file__))
+
+MY_DRIVE_DATA_MINING = file_path#os.getcwd() + '/app' #'/content/drive/My Drive/Data Mining'
 
 STYLE_WITH_DESC_N_TITLE_SAMPLED = MY_DRIVE_DATA_MINING+'/styles_with_description_title_RandomSampled.csv'
 

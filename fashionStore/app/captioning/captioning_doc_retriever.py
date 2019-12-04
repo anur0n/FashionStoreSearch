@@ -2,10 +2,11 @@ import csv
 #from tqdm import tqdm
 import os
 
+file_path = os.path.dirname(os.path.realpath(__file__))
 
-MY_DRIVE = os.getcwd() + '/app/captioning' #'/content/drive/My Drive/Data Mining'
+MY_DRIVE = file_path #os.getcwd() + '/app/captioning' #'/content/drive/My Drive/Data Mining'
 
-DIBA_DRIVE = os.getcwd() + '/app/captioning' #'/content/drive/My Drive/Rubel/DM/img_captioning'
+DIBA_DRIVE = file_path #os.getcwd() + '/app/captioning' #'/content/drive/My Drive/Rubel/DM/img_captioning'
 MY_DRIVE = DIBA_DRIVE
 
 FLICKR_FILE_GEN = DIBA_DRIVE+'/captions_sampled_generated.csv'

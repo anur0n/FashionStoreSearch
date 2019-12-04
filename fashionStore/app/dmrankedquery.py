@@ -11,8 +11,8 @@ Original file is located at
 #drive.mount('/content/drive')
 
 import nltk
-nltk.download('stopwords')
-nltk.download('wordnet')
+# nltk.download('stopwords')
+# nltk.download('wordnet')
 
 from collections import defaultdict
 from nltk.corpus import stopwords
@@ -32,7 +32,9 @@ from numpy.linalg import norm
 from docRetriever import DocRetriever
 from nltk.stem import WordNetLemmatizer
 
-MY_DRIVE = os.getcwd() + '/app' #'/content/drive/My Drive/Data Mining'
+file_path = os.path.dirname(os.path.realpath(__file__))
+
+MY_DRIVE = file_path #+ '/app' #'/content/drive/My Drive/Data Mining'
 
 STYLE_WITH_DESC_N_TITLE = MY_DRIVE+'/styles_with_description_title.csv'
 # INVERTED_IDX_FILE = MY_DRIVE+'/app/store_index_tf_idf_Random.dat'
@@ -98,9 +100,12 @@ class QueryHandler():
     terms = doc.split()
 
     if not noReduction:
+        # print(terms)
         terms = [term for term in terms if term not in self.stopwords]
+        # print(terms)
         terms = [self.lemmatizer.lemmatize(term) for term in terms]
         terms = [self.stemmer.stem(term) for term in terms]
+        # print(terms)
 
     if uniqueTermsOnly:
         terms = (dict.fromkeys(terms))
@@ -147,7 +152,7 @@ class QueryHandler():
     query=self.getTerms(query)
     if len(query)==0:
       print('Empty')
-      return
+      return []
 
     print(query)
     docList=set()

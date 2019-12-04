@@ -11,12 +11,13 @@ Original file is located at
 #drive.mount('/content/drive')
 
 import nltk
-nltk.download('stopwords')
-nltk.download('wordnet')
+# nltk.download('stopwords')
+# nltk.download('wordnet')
 
 from collections import defaultdict
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
+from nltk.stem.snowball import SnowballStemmer
 from array import array
 #from tqdm import tqdm
 import csv
@@ -37,9 +38,11 @@ from nltk.stem import WordNetLemmatizer
 forCaptioning = True
 ##############################
 
-MY_DRIVE = os.getcwd() + '/app/captioning' #+ '/app' #'/content/drive/My Drive/Data Mining'
+file_path = os.path.dirname(os.path.realpath(__file__))
 
-DIBA_DRIVE = os.getcwd() + '/app/captioning'#+ '/app' #'/content/drive/My Drive/Rubel/DM/img_captioning'
+MY_DRIVE = file_path #os.getcwd() + '/app/captioning' #+ '/app' #'/content/drive/My Drive/Data Mining'
+
+DIBA_DRIVE = file_path #os.getcwd() + '/app/captioning'#+ '/app' #'/content/drive/My Drive/Rubel/DM/img_captioning'
 MY_DRIVE = DIBA_DRIVE
 
 FLICKR_FILE_GEN = DIBA_DRIVE+'/captions_sampled_generated.csv'
@@ -81,6 +84,8 @@ class ImageQueryHandler():
       postings=[x.split(':') for x in postings] #postings=[['docId1', 'pos1,pos2'], ['docID2', 'pos1,pos2']]
       postings=[ [int(x[0][:-4]), map(int, x[1].split(','))] for x in postings ]   #final postings list
       self.index[term]=postings
+      if term == 'differ':
+          print(line)
       #read tf
       tfl = tfl.split(',')
       self.tf[term] = tfl#map(float, tfl)
@@ -97,7 +102,7 @@ class ImageQueryHandler():
     self.stopwords = set(stopwords.words('english'))
     self.dataFile = FLICKR_FILE_GEN
     self.indexFile = FLICKR_INVERTED_IDX_FILE
-    self.stemmer = PorterStemmer()
+    self.stemmer = SnowballStemmer('english') #PorterStemmer()
     self.lemmatizer = WordNetLemmatizer()
 
   def detectQueryType(self, query):
@@ -115,7 +120,7 @@ class ImageQueryHandler():
 
     if not noReduction:
         terms = [term for term in terms if term not in self.stopwords]
-        terms = [self.lemmatizer.lemmatize(term) for term in terms]
+        # terms = [self.lemmatizer.lemmatize(term) for term in terms]
         terms = [self.stemmer.stem(term) for term in terms]
 
     if uniqueTermsOnly:
@@ -140,11 +145,20 @@ class ImageQueryHandler():
         continue
       print('Ranking2: '+str(datetime.datetime.now()))
       queryVector[termIndex] = self.idf[term]
+    #   print(term)
+    #   print('++++++++++++++++++++++++++++++++++++++++++')
+    #   print(self.index[term])
+    #   print('------------------------------------------')
       for docIndex, (doc, postings) in enumerate(self.index[term]):
 #         pass
         if doc in docs:
           tfScores = list(self.tf[term])
+        #   print(tfScores)
           docVectors[doc][termIndex] = float(tfScores[docIndex])
+        #   if doc == '4771139963':
+        #   print(doc)
+        #   print(term)
+        #   print(docVectors[doc])
 #       print('Ranking3: '+str(datetime.datetime.now()))
     print(queryVector)
     docScores=[[self.dotProduct(curDocVec, queryVector), doc, curDocVec, queryVector] for doc, curDocVec in docVectors.items()]
@@ -163,7 +177,7 @@ class ImageQueryHandler():
     query=self.getTerms(query)
     if len(query)==0:
       print('Empty')
-      return
+      return []
 
     print(query)
     docList=set()
@@ -264,7 +278,7 @@ class ImageQueryHandler():
     elif queryType == QueryType.PhQ:
       docs = self.performPhraseQuery(query)
 
-    # print(docs)
+    print(docs)
     docRetriever = CaptionDocRetriever()
     # print(type(docs[0]))
     docs=[docs[i] for i in range(min(MAX_NO_RESULT, len(docs)))]
@@ -274,7 +288,7 @@ class ImageQueryHandler():
     tf_idf_scores = [x[0] for x in docs]
     # print(scores)
     docIds = [x[1] for x in docs]
-    # print(docs)
+    # print(docIds)
     tf_scores = [x[2] for x in docs]
 
     idf_scores = [x[3] for x in docs]
