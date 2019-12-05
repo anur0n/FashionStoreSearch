@@ -9,7 +9,7 @@ file_path = os.path.dirname(os.path.realpath(__file__))
 # print(file_path)
 sys.path.append(file_path + '/captioning/')
 
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, Response
 
 import time
 import re
@@ -40,6 +40,7 @@ nbClassifier = NaiveBayesClassifier(productCategories)
 isIndexLoaded = False
 isNBCIndexLoaded = False
 isImgIndexLoaded = False
+isPreloaded = False
 
 def highlight_terms(queryTerms, doc):
 
@@ -182,6 +183,7 @@ IMAGES_PATH = '/static/images/'
 TMP_IMAGE_PATH = file_path +'/static/tmpfiles/tmp.jpg'
 @app.route('/', methods=['GET', 'POST'])
 def submit():
+    preloadIndices()
     # if 'query' in request.args:
     #     q = request.args.get("q")
     #     query = q.split()
@@ -189,9 +191,15 @@ def submit():
     #     return render_template('search/index.html', q=q, query=query)
     print("Submitted")
     print(request.args)
+    request_data = request.get_json()
+    print(request_data)
+    if request_data is not None:
+        if request_data['action'] == 'runner_script':
+            return Response(status=200)
+
     if request.method == 'POST':
         print('Here')
-        #print()
+
         if request.form['action'] == 'Search':
             print('Search')
             return search(request)
@@ -220,6 +228,10 @@ def submit():
  #   return str(queryHandler.performQuery(' toy'))
 
 def preloadIndices():
+    global isPreloaded
+    if isPreloaded:
+        print('Indices already loaded')
+        return
     print('Loading indices')
     queryHandler.prepareParams()
     queryHandler.prepareParams()
@@ -234,15 +246,18 @@ def preloadIndices():
     imgQueryHandler.readIndex()
     capgen.prepare_params()
     isImgIndexLoaded = True
+
+    isPreloaded = True
+    print('preloaded indices')
     # queryHandler.readIndex()
     # queryHandler.performQuery('Blue check shirt')
     # print(highlight_terms(queryHandler.getTerms("blue narrow"), 'Blue narrowed check shirt blue'))
     print('Service loaded successfully')
-if __name__ == '__main__':
+# if __name__ == '__main__':
 
 # preloading_thread = threading.Thread(target=preloadIndices)
 # preloading_thread.start()
 
-    print('App loaded')
+print('App loaded')
 
-    app.run()
+    # app.run()
