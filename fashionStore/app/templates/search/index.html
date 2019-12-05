@@ -55,6 +55,25 @@
 					<div class="container">
 						<p>{{query}}</p>
 					</div>
+					<br>
+					{% if captionWords|length-1 >0 %}
+						<div class="container">
+							<p>Word prediction scores:</p>
+						</div>
+						
+						<table style="width:100%">
+							<tr>
+								<th>Predicted word</th>
+								<th>Score:argmax(predictions of all tokens)</th>
+							</tr>
+							{% for j in range(0, captionWords|length-1) %}
+								<tr>
+									<td>{{captionWords[j]}}</td>
+									<td>{{'%0.6f'| format(predictionScore[j]|float)}}</td>
+								</tr>
+							{% endfor %}
+						</table>
+					{% endif %}
 				</div>
 			</div>
 			<br>
@@ -75,12 +94,13 @@
 				<div class="polaroid">
 					<img src={{ images[i] }} />
 					<div>
-						<b><i>Caption:   {{captions[i]}}</i></b>
+						<b>Caption:</b> {{captions[i]}}
 					</div>
+					<br>
 					<div>
-						<b><i>Total tf-idf Score:   {{'%0.4f'| format(tf_idf_scores[i]|float)}}</i></b>
+						<i>Total tf-idf Score:   {{'%0.4f'| format(tf_idf_scores[i]|float)}}</i>
 						<br>
-						<b><i>Document length:   {{docLengths[i]}}</i></b>
+						<i>Document length:   {{docLengths[i]}}</i>
 						<br><br>
 					</div>
 					<div>

@@ -84,8 +84,8 @@ class ImageQueryHandler():
       postings=[x.split(':') for x in postings] #postings=[['docId1', 'pos1,pos2'], ['docID2', 'pos1,pos2']]
       postings=[ [int(x[0][:-4]), map(int, x[1].split(','))] for x in postings ]   #final postings list
       self.index[term]=postings
-      if term == 'differ':
-          print(line)
+      # if term == 'differ':
+      #    print(line)
       #read tf
       tfl = tfl.split(',')
       self.tf[term] = tfl#map(float, tfl)
@@ -278,7 +278,7 @@ class ImageQueryHandler():
     elif queryType == QueryType.PhQ:
       docs = self.performPhraseQuery(query)
 
-    print(docs)
+    # print(docs)
     docRetriever = CaptionDocRetriever()
     # print(type(docs[0]))
     docs=[docs[i] for i in range(min(MAX_NO_RESULT, len(docs)))]

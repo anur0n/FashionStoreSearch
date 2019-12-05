@@ -191,28 +191,28 @@ class RNN_Decoder(tf.keras.Model):
 
 def load_image(image_path):
     # print(image_path)
-    print('Loading image from : ' + image_path)
+    # print('Loading image from : ' + image_path)
     img = tf.read_file(image_path)
-    print('Decoding image from : ' + image_path)
+    # print('Decoding image from : ' + image_path)
     img = tf.image.decode_jpeg(img, channels=3)
-    print('Resizing image from : ' + image_path)
+    # print('Resizing image from : ' + image_path)
     img = tf.image.resize_images(img, (299, 299))
-    print('Preprocessing image from : ' + image_path)
+    # print('Preprocessing image from : ' + image_path)
     img = tf.keras.applications.inception_v3.preprocess_input(img)
-    print('Preprocessing Done')
+    # print('Preprocessing Done')
     return img, image_path
 
 
 def evaluate(image):
-    print('Generating caption in evaluate function')
+    # print('Generating caption in evaluate function')
     attention_plot = np.zeros((max_length, attention_features_shape))
-    print('Generating caption in evaluate function2')
+    # print('Generating caption in evaluate function2')
     hidden = decoder.reset_state(batch_size=1)
-    print('Generating caption in evaluate function3')
+    # print('Generating caption in evaluate function3')
     temp_input = tf.expand_dims(load_image(image)[0], 0)
-    print('Generating caption in evaluate function4')
+    # print('Generating caption in evaluate function4')
     img_tensor_val = image_features_extract_model(temp_input)
-    print('Generating caption in evaluate function5')
+    # print('Generating caption in evaluate function5')
     img_tensor_val = tf.reshape(img_tensor_val, (img_tensor_val.shape[0], -1, img_tensor_val.shape[3]))
 
     features = encoder(img_tensor_val)
@@ -224,22 +224,28 @@ def evaluate(image):
     # print(dec_input)
 
     # print(decoder.attention.W1)
-    print('Entering caption generation loop')
+    # print('Entering caption generation loop')
+    predictionScore = []
     for i in range(max_length):
         predictions, hidden, attention_weights = decoder(dec_input, features, hidden)
         # print(predictions)
+        
         attention_plot[i] = tf.reshape(attention_weights, (-1, )).numpy()
 
         predicted_id = tf.argmax(predictions[0]).numpy()
+        predictionScore.append(predictions[0][predicted_id])
+        # print(predictions[0])
+        # print(predicted_id)
         result.append(tokenizer.index_word[predicted_id])
 
         if tokenizer.index_word[predicted_id] == '<end>':
-            return result, attention_plot
+            return result, attention_plot, predictionScore
 
         dec_input = tf.expand_dims([predicted_id], 0)
 
     attention_plot = attention_plot[:len(result), :]
-    return result, attention_plot
+    # print(predictionScore)
+    return result, attention_plot, predictionScore
 
 def plot_attention(image, result, attention_plot):
     temp_image = np.array(Image.open(image))
@@ -267,7 +273,7 @@ def plot_attention(image, result, attention_plot):
 # image_path = tf.keras.utils.get_file('image3'+image_extension,
 #                                      origin=image_url)
 # print(image_path)
-# result, attention_plot = evaluate(image_path)
+# result, attention_plot, _ = evaluate(image_path)
 # print ('Prediction Caption:', ' '.join(result))
 # plot_attention(image_path, result, attention_plot)
 

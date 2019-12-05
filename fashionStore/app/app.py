@@ -142,13 +142,16 @@ def image_search():
     if query == '' and img_file == None:
         return render_template('search/index.html', opType = 'image_search', query='')
     query_img = ''
+    captionWords = []
+    predictionScore = []
     if img_file != None:
         print('Saving file to: ' + TMP_IMAGE_PATH)
         img_file.save(TMP_IMAGE_PATH)
         print('file saved to ' + TMP_IMAGE_PATH)
         print('Generating caption')
-        caption, _ = capgen.evaluate(TMP_IMAGE_PATH)
-        query = ' '.join(caption)
+        #print(capgen.evaluate(TMP_IMAGE_PATH))
+        captionWords, _, predictionScore = capgen.evaluate(TMP_IMAGE_PATH)
+        query = ' '.join(captionWords)
         query = query.replace("<end>", "")
         query_img = '/static/tmpfiles/tmp.jpg'+'?'+str(datetime.datetime.now()) #To disable browser cache
         print('Caption: ' + query)
@@ -168,7 +171,7 @@ def image_search():
     outStr = ''
     return render_template('search/index.html', opType = 'image_search', titles = titles, images = image_urls, captions = captions, \
                 tf_idf_scores=tf_idf_scores, tf_scores = tf_scores, idf_scores = idf_scores, query = query, \
-                docLengths = docLengths, terms = terms, query_img = query_img)
+                docLengths = docLengths, terms = terms, query_img = query_img, captionWords = captionWords, predictionScore = predictionScore)
 
 def uploadImage():
     f = request.files['file']
@@ -235,11 +238,11 @@ def preloadIndices():
     # queryHandler.performQuery('Blue check shirt')
     # print(highlight_terms(queryHandler.getTerms("blue narrow"), 'Blue narrowed check shirt blue'))
     print('Service loaded successfully')
-# if __name__ == '__main__':
+if __name__ == '__main__':
 
 # preloading_thread = threading.Thread(target=preloadIndices)
 # preloading_thread.start()
 
-print('App loaded')
+    print('App loaded')
 
-    # app.run()
+    app.run()
